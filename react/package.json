@@ -1,0 +1,15 @@
+{
+  "name": "react",
+  "version": "1.0.0",
+  "main": "intex.tsx",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.26.1",
+    "react": "^17.0.2",
+    "react-dom": "^18.0.0",
+    "react-to-pdf": "^0.0.14"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.23"
+  }
+}
