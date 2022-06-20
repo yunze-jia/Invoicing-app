@@ -1,7 +1,7 @@
 /* global jsPDF */
 import React, {useEffect, useState} from 'react'
 import {constants} from "../node/utils/constant";
-import axios from "axios";
+// import axios from "axios";
 import {BuyerTemplate} from './templates/buyer';
 import {SellerTemplate} from './templates/seller';
 const styles = require('./index.css')

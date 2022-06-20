@@ -14,17 +14,18 @@ export async function orderHooks(ctx: any, next: () => Promise<any>) {
         data: {
             "filter": {
                 "type": "FromWorkflow",
-                "status": ["order-completed", "handling", "ready-for-handling", "waiting-ffmt-authorization", "cancel"]
+                "status": ["approve-payment"]
+                // "status": ["order-completed", "handling", "ready-for-handling", "waiting-ffmt-authorization", "cancel"]
             },
             "hook": {
-                "url": "https://tnia--vtexasia.myvtex.com/_v/ordersWebhook",
+                "url": "https://dnia--vtexasia.myvtex.com/_v/ordersWebhook",
                 "headers": {
                     "key": "value"
                 }
             }
         }
     };
-
+    console.log(options.data)
     await axios.request(options).then(function (response: any) {
         console.log(response.data);
         ctx.status = 200

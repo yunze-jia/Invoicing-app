@@ -5,9 +5,10 @@ import { Clients } from './clients'
 // import { status } from './middlewares/status'
 // import { validate } from './middlewares/validate'
 import {orderHooks} from "./middlewares/orderHooks";
-import { ordersWebhook, sendEmail} from "./middlewares/ordersWebhook";
+import { ordersWebhook} from "./middlewares/ordersWebhook";
 import {getOrderDetails} from "./middlewares/getOrder";
-
+import { getBuyerInvoiceDetails } from './middlewares/buyerInvoice';
+// import {  getBuyerInvoiceDetailss } from './middlewares/buyerInvoice';
 const TIMEOUT_MS = 800
 
 // Create a LRU memory cache for the Status client.
@@ -54,11 +55,11 @@ export default new Service({
     createOrderHooks: method({
       POST: [orderHooks],
    }),
-    email: method({
-      POST: [sendEmail],
-    }),
     getOrder:method(({
       POST:[getOrderDetails]
-    }))
+    })),
+    buyerInvoice:method({
+      GET:[getBuyerInvoiceDetails]
+    })
   },
 })

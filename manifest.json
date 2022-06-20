@@ -1,7 +1,7 @@
 {
   "name": "native-invoicing-app-theme",
   "vendor": "vtexasia",
-  "version": "0.0.2-beta",
+  "version": "0.0.3-beta",
   "title": "Native Invoicing Application",
   "description": "Sending the invoice email to both Buyer and Seller ",
   "mustUpdateAt": "2018-01-04",
@@ -17,6 +17,27 @@
     "prereleasy": "bash lint.sh"
   },
   "credentialType": "absolute",
+  "settingsSchema": {
+    "title": "native-invoicing",
+    "type": "object",
+    "properties": {
+      "app_key": {
+        "title": "Application key",
+        "description": "used to access the vtex api",
+        "type": "string"
+      },
+      "app_token": {
+        "title": "application token",
+        "description": "used to access the vtex apis",
+        "type": "string"
+      },
+      "marketplace_email": {
+        "title": "admin email in marketplace",
+        "description": "used to send the invoice to the buyer and seller",
+        "type": "string"
+      }
+    }
+  },
   "policies": [
     {
       "name": "outbound-access",
@@ -44,6 +65,9 @@
     },
     {
       "name": "colossus-write-logs"
+    },
+    {
+      "name": "vbase-read-write"
     }
   ],
   "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
