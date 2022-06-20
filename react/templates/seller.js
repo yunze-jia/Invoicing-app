@@ -79,12 +79,6 @@ export const SellerTemplate = ({ body }) => {
                 </tr>
               ))}
             </tbody>
-            {/* <tbody>
-              <tr>
-                <td> {order.items[0].quantity}</td>
-                <td>{order.items[0].price}</td>
-              </tr>
-            </tbody> */}
             <span>
               <p>Grand Total : {(order?.totals?.[0]?.value)/100}</p>
               <p>Discount : {(order?.totals?.[1]?.value)/100}</p>
