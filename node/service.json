@@ -25,6 +25,14 @@
     "buyerInvoice":{
       "path":"/_v/orders/buyerxa/:orderId",
       "public":true
+    },
+    "sellerInvoiceInfo":{
+      "path":"/_v/orders/seller/:sellerId",
+      "public":true
+    },
+    "buyerEncrptEnvoice":{
+      "path":"/_v/orders/buyerEncrptEmails/:orderId", 
+      "public":true
     }
   }
 }

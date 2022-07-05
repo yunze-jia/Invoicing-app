@@ -1,71 +1,125 @@
 .invoice-box {
-    max-width: 800px;
-    margin: auto;
-    padding: 30px;
-    border: 1px solid #eee;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-    font-size: 16px;
-    line-height: 24px;
-    font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
-    color: #555;
-    display: inline-block;
+  max-width: 800px;
+  margin: auto;
+  padding: 30px;
+  border: 1px solid #eee;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+  font-size: 16px;
+  line-height: 24px;
+  font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
+  color: #555;
+  display: inline-block;
 }
 
-.invoice-header{
-    font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
-    text-align: center;
+.invoice-header {
+  font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
+  text-align: center;
 }
 
 .container {
-    padding: 10px;
-    width:73%;
-    border-style:double;
-    margin-left: 10%
+   padding: 10px;
+ display: flex;
+ justify-content: center;
+
 }
 
-.spaces     {
-    margin-right: 10%;
+.spaces {
+  margin-right: 10%;
 }
 
-.bold{
-    font-weight: bold;
-    /*display: inline-block;*/
+.bold {
+  font-weight: bold;
+  /*display: inline-block;*/
 }
 
-.floatright{
-    float: right;
+.floatright {
+  float: right;
 }
 
-.invoice{
-    float: right;
-    font-weight: bold;
+.invoice {
+  float: right;
+  font-weight: bold;
 }
-.shipto{
-    font-size: 24px;
-    border: 1px solid;
-    color: ghostwhite;
-    border-radius: 3px;
-    background: black;
-    width: 50%;
-}
-
-.invoicestyle{
-    font-size: 24px;
-    border: 1px solid;
-    color: ghostwhite;
-    border-radius: 3px;
-    background: black;
+.shipto {
+  font-size: 24px;
+  border: 1px solid;
+  color: ghostwhite;
+  border-radius: 3px;
+  background: black;
+  width: 50%;
 }
 
-.aligntablecenter{
-    text-align: center;
+.invoicestyle {
+  font-size: 24px;
+  border: 1px solid;
+  color: ghostwhite;
+  border-radius: 3px;
+  background: black;
 }
 
-.tablea{
-    width: inherit !important;
+.aligntablecenter {
+  text-align: center;
 }
 
 
-table, th, td {
-    border: 1px solid;
+
+table{
+  border-collapse: collapse;
+  width: 100%;
 }
+
+th,
+td {
+  text-align: left;
+    padding: 8px;
+    border-bottom:solid 1px #E3E4E6;
+}
+
+
+
+
+.printButton {
+  background-color: #003df6;
+  border: none;
+  color: white;
+  padding: 6px 10px;
+  cursor: pointer;
+  text-transform: uppercase;
+  border-radius: 3px;
+}
+.status{
+  border-radius:30px;
+  background-color: #8BC34A;
+  width: auto;
+  padding:5px 20px; 
+  
+}
+.fontColor{
+  color: #979899;
+}
+
+.orderStyle{
+font-family: Inter;
+font-style: normal;
+font-weight: 700;
+font-size: 24px;
+line-height: 29px;
+color: #000000;
+}
+.fontOuter{
+  display: flex;
+  flex-direction: row;
+  align-items:center;
+  color: #979899;
+}
+.fontInner{
+  width: 20%;
+  display: flex;
+  align-items:center,
+}
+.statusFontOuter{
+  display: flex;
+  flex-direction: row;
+  align-items:center;
+}
+

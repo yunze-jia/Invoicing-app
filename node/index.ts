@@ -8,6 +8,8 @@ import {orderHooks} from "./middlewares/orderHooks";
 import { ordersWebhook} from "./middlewares/ordersWebhook";
 import {getOrderDetails} from "./middlewares/getOrder";
 import { getBuyerInvoiceDetails } from './middlewares/buyerInvoice';
+import { sellerInvoiceInfo } from './middlewares/sellerInvoiceInfo';
+import { getBuyerEmail } from './middlewares/buyerEncrptEnvoice';
 // import {  getBuyerInvoiceDetailss } from './middlewares/buyerInvoice';
 const TIMEOUT_MS = 800
 
@@ -60,6 +62,12 @@ export default new Service({
     })),
     buyerInvoice:method({
       GET:[getBuyerInvoiceDetails]
+    }),
+    sellerInvoiceInfo:method({
+      POST:[sellerInvoiceInfo]
+    }),
+    buyerEncrptEnvoice:method({
+      GET:[getBuyerEmail]
     })
   },
 })

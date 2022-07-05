@@ -35,6 +35,11 @@
         "title": "admin email in marketplace",
         "description": "used to send the invoice to the buyer and seller",
         "type": "string"
+      },
+      "invoice_logo": {
+        "title": "invoice logo",
+        "description": "used to add the logo in invoices",
+        "type": "string"
       }
     }
   },
@@ -50,6 +55,13 @@
       "name": "outbound-access",
       "attrs": {
         "host": "vtexasia.vtexcommercestable.com.br",
+        "path": "*"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "conversationtracker.vtex.com.br",
         "path": "*"
       }
     },
