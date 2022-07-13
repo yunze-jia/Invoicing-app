@@ -9,7 +9,19 @@ import {
   getBuyerDecEmail,
 } from '../services/order'
 
+export const getLogo = (setLogo) => {
+  const tempLogo = Array.from(
+    document.getElementsByClassName(
+      'vtex-store-components-3-x-logoImage vtex-render-runtime-8-x-lazyload lazyloaded'
+    )
+  )
+  // const finalLogo=tempLogo?.map((data)=>data.src)
+  // console.log(finalLogo);
+  setLogo(tempLogo)
+}
+
 export const BuyerTemplate = ({ body }) => {
+  const [test, setTest] = useState(false)
   console.log(body)
   const orderId = body.params ? body.params.order_id : null
   const invoiceUrl = body.params ? body.params.invoice_url : null
@@ -18,6 +30,7 @@ export const BuyerTemplate = ({ body }) => {
   // const orderDetails =  await getOrderDetails(orderId,"vtexasia")
   const [order, setOrder] = useState([])
   const [email, setEmail] = useState([])
+  const [logo, setLogo] = useState([])
   useEffect(() => {
     // async function setOrderDetails() {
     //     if (orderId) {
@@ -26,6 +39,7 @@ export const BuyerTemplate = ({ body }) => {
     // }
 
     setOrderDetails()
+    setInterval(getLogo(setLogo, logo), 2000)
   }, [])
   async function setOrderDetails() {
     if (orderId) {
@@ -38,9 +52,12 @@ export const BuyerTemplate = ({ body }) => {
 
   console.log(email)
 
+  console.log('NewLogo=========>', logo)
+
   const downloadPdf = () => {
     window.print()
   }
+
   console.log(order)
   let vbaseKey = []
   if (order?.vbase) {
@@ -57,10 +74,27 @@ export const BuyerTemplate = ({ body }) => {
   let discount = null
   let grandTotals = 0
   return (
-    <div style={{ width: '70%' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <div />
-        <button className={styles.printButton}>print</button>
+    <div className={styles.aaa}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginBottom: '6%',
+        }}
+      >
+        <div>
+          <img
+            href="/"
+            src={
+              logo.length != 0
+                ? logo[0]
+                : 'https://brand.vtex.com/wp-content/themes/vtex-brand/img/logo.svg'
+            }
+          />
+        </div>
+        <button id='printPageButton'  className={styles.printButton} onClick={downloadPdf}>
+          print
+        </button>
       </div>
       {order?.vbase &&
         vbaseKey.map((data, index) => {
@@ -88,7 +122,7 @@ export const BuyerTemplate = ({ body }) => {
           issueDate = issuedStringDate.split(' ')
 
           const calculateGrandTotal = (subTotal, discount, price) => {
-            total = (subTotal / 100 - discount / 100 + price / 10).toFixed(2)
+            total = (subTotal / 100 - discount / 100 + price / 100).toFixed(2)
             grandTotals = Number(total) + grandTotals
             return total
           }
@@ -101,7 +135,14 @@ export const BuyerTemplate = ({ body }) => {
                   : 'solid 1px #E3E4E6',
               }}
             >
-              <div style={{ width: '100%', display: 'flex', marginTop: '2%' }}>
+              <div
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  marginTop: '2%',
+                  justifyContent: 'space-between',
+                }}
+              >
                 <div style={{ width: '50%' }}>
                   <div>
                     <b
@@ -151,13 +192,26 @@ export const BuyerTemplate = ({ body }) => {
                     </div>
                   </div>
                 </div>
-                <div style={{ width: '50%' }}>
+                <div
+                  style={{
+                    width: '50%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-end',
+                  }}
+                >
                   <div style={{ height: '20%' }}>
                     <b
                       className={styles.orderStyle}
                     >{`${order.vbase.newInvoiceData.name}`}</b>
                   </div>
-                  <div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'flex-end',
+                    }}
+                  >
                     <div>
                       <a href="#0">{`${email?.email}`}</a>
                     </div>
@@ -177,11 +231,11 @@ export const BuyerTemplate = ({ body }) => {
                 <table>
                   <thead>
                     <tr>
-                      <th>Description</th>
-                      <th>Reference</th>
-                      <th>Qty</th>
-                      <th>Unit price</th>
-                      <th>Amount</th>
+                      <th style={{ textAlign: 'left' }}>Description</th>
+                      <th style={{ textAlign: 'center' }}>Reference</th>
+                      <th style={{ textAlign: 'center' }}>Qty</th>
+                      <th style={{ textAlign: 'center' }}>Unit price</th>
+                      <th style={{ textAlign: 'right' }}>Amount</th>
                     </tr>
                   </thead>
                   <tbody className={styles.aligntablecenter}>
@@ -193,11 +247,17 @@ export const BuyerTemplate = ({ body }) => {
                       // total=(subTotal-discount+((order.vbase.shippingData.logisticsInfo[0].price)/10))
                       return (
                         <tr>
-                          <td>{item.name}</td>
-                          <td>{item.refId}</td>
-                          <td>{item.quantity}</td>
-                          <td>{item.unitPrice / 100}</td>
-                          <td>{item.priceDefinition.total / 100}</td>
+                          <td style={{ textAlign: 'left' }}>{item.name}</td>
+                          <td style={{ textAlign: 'center' }}>{item.refId}</td>
+                          <td style={{ textAlign: 'center' }}>
+                            {item.quantity}
+                          </td>
+                          <td style={{ textAlign: 'center' }}>
+                            {item.unitPrice / 100}
+                          </td>
+                          <td style={{ textAlign: 'right' }}>
+                            {item.priceDefinition.total / 100}
+                          </td>
                         </tr>
                       )
                     })}
@@ -212,38 +272,34 @@ export const BuyerTemplate = ({ body }) => {
                   fontWeight: 700,
                 }}
               >
-                <div style={{ width: '30%' }}>
+                <div className={styles.totalStyle}>
                   <div
                     style={{ display: 'flex', justifyContent: 'space-between' }}
                   >
                     <p style={{ color: '#979899' }}>Subtotal</p>
-                    <p style={{ paddingRight: '20%', color: '#979899' }}>
-                      {`${subTotal / 100}`}
-                    </p>
+                    <p style={{ color: '#979899' }}>{`${subTotal / 100}`}</p>
                   </div>
                   <div
                     style={{ display: 'flex', justifyContent: 'space-between' }}
                   >
                     <p style={{ color: '#979899' }}>Discount : </p>
-                    <p style={{ paddingRight: '20%', color: '#979899' }}>
-                      {`${discount / 100}`}
-                    </p>
+                    <p style={{ color: '#979899' }}>{`${discount / 100}`}</p>
                   </div>
                   <div
                     style={{ display: 'flex', justifyContent: 'space-between' }}
                   >
                     <p style={{ color: '#979899' }}>Shipping</p>
-                    <p style={{ paddingRight: '20%', color: '#979899' }}>
-                      {`${
-                        order.vbase.shippingData.logisticsInfo[0].price / 10
-                      }`}
+                    <p style={{ color: '#979899' }}>
+                      {`${(
+                        order.vbase.shippingData.logisticsInfo[0].price / 100
+                      ).toFixed(2)}`}
                     </p>
                   </div>
                   <div
                     style={{ display: 'flex', justifyContent: 'space-between' }}
                   >
                     <p>Total (incl. VAT) : </p>
-                    <p style={{ paddingRight: '20%' }}>{`${calculateGrandTotal(
+                    <p>{`${calculateGrandTotal(
                       subTotal,
                       discount,
                       order?.data?.shippingData?.logisticsInfo[0]?.price
@@ -261,17 +317,16 @@ export const BuyerTemplate = ({ body }) => {
           justifyContent: 'end',
         }}
       >
-        <div
-          style={{
-            display: 'flex',
-            fontWeight: 1000,
-            justifyContent: 'space-between',
-            paddingRight: '5%',
-            width: '27%',
-          }}
+        <div className={styles.grandTotalStyle}
+          // style={{
+          //   display: 'flex',
+          //   fontWeight: 1000,
+          //   justifyContent: 'space-between',
+          //   width: '24%',
+          // }}
         >
           <p>Grand Total</p>
-          <p>{`${grandTotals}`}</p>
+          <p>{`${grandTotals.toFixed(2)}`}</p>
         </div>
       </div>
     </div>

@@ -144,15 +144,11 @@ export const getBuyerDecEmail = async (orderId) => {
     },
   }
 
-  debugger
-
   const decrEmail = await axios.request(options)
   console.debug(decrEmail)
   if (decrEmail) {
-    debugger
     return decrEmail.data
   } else {
-    debugger
     return 'something went wrong in getBuyerDecEmail'
   }
 }

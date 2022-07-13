@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { getOrderDetails, getSellerInfo } from '../services/order'
+import { getLogo } from './buyer'
 
 const styles = require('../index.css')
 
@@ -11,20 +12,20 @@ export const SellerTemplate = ({ body }) => {
   // const orderDetails =  await getOrderDetails(orderId,"vtexasia")
   const [order, setOrder] = useState([])
   const [sellerInfo, setSellerInfo] = useState([])
-
+  const [logo, setLogo] = useState([])
   async function setOrderDetails() {
     if (orderId) {
       const temp = await getOrderDetails(orderId, invoiceUrl, type, sellerId)
       setOrder(temp)
-      const sellerIds = temp?.items?.find((data) => data).seller;
+      const sellerIds = temp?.items?.find((data) => data).seller
       setSellerInfo(await getSellerInfo(sellerIds))
     }
   }
   console.log(sellerInfo)
   useEffect(() => {
     setOrderDetails()
+    setInterval(getLogo(setLogo, logo), 2000)
   }, [])
-
 
   console.log(order)
   const downloadPdf = () => {
@@ -51,7 +52,7 @@ export const SellerTemplate = ({ body }) => {
 
   const calculateGrandTotal = (subTotal, discount, price) => {
     //calculating Grand Total
-    total = (subTotal / 100 + discount / 100 + price / 10).toFixed(2)
+    total = (subTotal / 100 + discount / 100 + price / 100).toFixed(2)
     grandTotals = Number(total) + grandTotals
     return total
   }
@@ -73,13 +74,37 @@ export const SellerTemplate = ({ body }) => {
   }
 
   return (
-    <div style={{ width: '70%' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <div />
-        <button className={styles.printButton}>print</button>
+    <div className={styles.aaa}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginBottom: '6%',
+        }}
+      >
+        <div>
+          <img
+            href="/"
+            src={
+              logo.length != 0
+                ? logo[0]
+                : 'https://brand.vtex.com/wp-content/themes/vtex-brand/img/logo.svg'
+            }
+          />
+        </div>
+        <button className={styles.printButton} onClick={downloadPdf}>
+          print
+        </button>
       </div>
 
-      <div style={{ width: '100%', display: 'flex', marginTop: '2%' }}>
+      <div
+        style={{
+          width: '100%',
+          display: 'flex',
+          marginTop: '2%',
+          justifyContent: 'space-between',
+        }}
+      >
         <div style={{ width: '50%' }}>
           <div>
             <b className={styles.orderStyle}>{`Order ${order?.orderId}`}</b>
@@ -129,7 +154,14 @@ export const SellerTemplate = ({ body }) => {
             </div>
           </div>
         </div>
-        <div style={{ width: '50%' }}>
+        <div
+          style={{
+            width: '50%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+          }}
+        >
           <div style={{ height: '20%' }}>
             <b className={styles.orderStyle}>
               {`${order?.sellers?.map((data) => data.name)}`}
@@ -146,11 +178,11 @@ export const SellerTemplate = ({ body }) => {
         <table>
           <thead>
             <tr>
-              <th>Description</th>
-              <th>Reference</th>
-              <th>Qty</th>
-              <th>Unit price</th>
-              <th>Amount</th>
+              <th style={{ textAlign: 'left' }}>Description</th>
+              <th style={{ textAlign: 'center' }}>Reference</th>
+              <th style={{ textAlign: 'center' }}>Qty</th>
+              <th style={{ textAlign: 'center' }}>Unit price</th>
+              <th style={{ textAlign: 'right' }}>Amount</th>
             </tr>
           </thead>
           <tbody className={styles.aligntablecenter}>
@@ -160,11 +192,15 @@ export const SellerTemplate = ({ body }) => {
                 subTotal = data?.priceDefinition?.total + (index ? subTotal : 0)
                 return (
                   <tr>
-                    <td>{data.name}</td>
-                    <td>{data.refId}</td>
-                    <td>{data.quantity}</td>
-                    <td>{data.sellingPrice / 100}</td>
-                    <td>{data.priceDefinition.total / 100}</td>
+                    <td style={{ textAlign: 'left' }}>{data.name}</td>
+                    <td style={{ textAlign: 'center' }}>{data.refId}</td>
+                    <td style={{ textAlign: 'center' }}>{data.quantity}</td>
+                    <td style={{ textAlign: 'center' }}>
+                      {data.sellingPrice / 100}
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      {data.priceDefinition.total / 100}
+                    </td>
                   </tr>
                 )
               })
@@ -180,28 +216,26 @@ export const SellerTemplate = ({ body }) => {
           fontWeight: 700,
         }}
       >
-        <div style={{ width: '30%' }}>
+        <div className={styles.totalStyle}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <p style={{ color: '#979899' }}>Subtotal</p>
-            <p style={{ paddingRight: '20%', color: '#979899' }}>
-              {`  ${subTotal / 100}`}
-            </p>
+            <p style={{ color: '#979899' }}>{`  ${subTotal / 100}`}</p>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <p style={{ color: '#979899' }}>Discount : </p>
-            <p style={{ paddingRight: '20%', color: '#979899' }}>
+            <p style={{ color: '#979899' }}>
               {`  ${CalculateDiscount(order)}`}
             </p>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <p style={{ color: '#979899' }}>Shipping</p>
-            <p style={{ paddingRight: '20%', color: '#979899' }}>
+            <p style={{ color: '#979899' }}>
               {`${calculateShippingCharge(order)}`}
             </p>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <p>Total (incl. VAT) : </p>
-            <p style={{ paddingRight: '20%' }}>
+            <p>
               {`${calculateGrandTotal(
                 subTotal,
                 discount,
@@ -211,7 +245,7 @@ export const SellerTemplate = ({ body }) => {
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <p style={{ color: '#979899' }}>Shipping comission </p>
-            <p style={{ paddingRight: '20%', color: '#979899' }}>
+            <p style={{ color: '#979899' }}>
               {/* {`  ${
                         order.vbase.shippingData.logisticsInfo[0].price / 10
                       }`} */}
@@ -219,8 +253,8 @@ export const SellerTemplate = ({ body }) => {
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <p style={{ color: '#979899' }}>Order comission </p>
-            <p style={{ paddingRight: '20%', color: '#979899' }}>
-              {`  ${order?.items?.map((data) => data.commission)}`}
+            <p style={{ color: '#979899' }}>
+              {`  ${order?.items?.map((data) => (data.commission/100).toFixed(2))}`}
             </p>
           </div>
         </div>
