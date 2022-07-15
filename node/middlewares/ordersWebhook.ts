@@ -16,6 +16,8 @@ export async function ordersWebhook(ctx: any) {
     clients: { apps },
   } = ctx
   ctx.status = 200
+  const workspace = ctx.req.headers['x-vtex-workspace']
+    console.log("workspace=======>",workspace)
   try {
     const payload: any = await json(ctx.req)
     console.log('the payload is  : ', payload)
@@ -63,7 +65,8 @@ export async function ordersWebhook(ctx: any) {
         orderDetails.clientProfileData.email,
         account,
         invoiceNumber.DocumentId,
-        customFields
+        customFields,
+        workspace
       )
       console.log(buyerDetails)
     }
@@ -73,7 +76,8 @@ export async function ordersWebhook(ctx: any) {
         data,
         account,
         invoiceNumber.DocumentId,
-        customFields
+        customFields,
+        workspace
       )
     })
     return
@@ -260,7 +264,8 @@ async function notifyBuyer(
   email: string,
   account: string,
   invoiceNo: string,
-  customFields: any
+  customFields: any,
+  workspace:any
 ) {
   console.log('the order id is : ' + orderId + ' the account is : ' + account)
 
@@ -280,7 +285,7 @@ async function notifyBuyer(
       jsonData: {
         cc: customFields.marketplace_email,
         email: email,
-        invoiceUrl: `https://dnia--vtexasia.myvtex.com/invoice/buyer/${orderId}/${invoiceNo}`,
+        invoiceUrl: `https://${workspace}--vtexasia.myvtex.com/invoice/buyer/${orderId}/${invoiceNo}`,
         message: 'This is a test',
       },
     },
@@ -305,7 +310,8 @@ async function notifySeller(
   data: any,
   account: string,
   invoiceNo: string,
-  customFields: any
+  customFields: any,
+  workspace:any
 ) {
   console.log('the order id is : ' + orderId + ' the account is : ' + account)
   const options = {
@@ -324,7 +330,7 @@ async function notifySeller(
       jsonData: {
         cc: customFields.marketplace_email,
         email: data.email,
-        invoiceUrl: `https://dnia--vtexasia.myvtex.com/invoice/seller/${data.sellerId}/${orderId}/${invoiceNo}`,
+        invoiceUrl: `https://${workspace}--vtexasia.myvtex.com/invoice/seller/${data.sellerId}/${orderId}/${invoiceNo}`,
         message: 'This is a test',
       },
     },
