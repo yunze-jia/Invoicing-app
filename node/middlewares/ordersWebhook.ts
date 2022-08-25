@@ -17,7 +17,7 @@ export async function ordersWebhook(ctx: any) {
   } = ctx
   ctx.status = 200
   const workspace = ctx.req.headers['x-vtex-workspace']
-    console.log("workspace=======>",workspace)
+  console.log('workspace=======>', workspace)
   try {
     const payload: any = await json(ctx.req)
     console.log('the payload is  : ', payload)
@@ -28,23 +28,19 @@ export async function ordersWebhook(ctx: any) {
     }
     const appId = process.env.VTEX_APP_ID as string
     const customFields = await apps.getAppSettings(appId)
-    console.log(customFields)
+    console.log({ customFields })
     const orderDetails: any = await getOrderDetails(
       payload.OrderId,
       account,
       customFields,
-      ctx
+      ctx,
     )
-    let tempitems = orderDetails.items
-    const ids = tempitems.map((o: any) => o.seller)
-    let sellerIds = ids.filter(
-      (id: any, index: any) => !ids.includes(id, index + 1)
-    )
+    let sellerIds = await extractSellerIds(orderDetails.items)
     console.log('Order Details ========>', JSON.stringify(orderDetails))
     const sellerEmail: any = await getSellerEmailById(
       sellerIds,
       account,
-      customFields
+      customFields,
     )
     const date = new Date()
     const body: any = {
@@ -87,11 +83,18 @@ export async function ordersWebhook(ctx: any) {
   }
 }
 
+async function extractSellerIds(items: any) {
+  const ids = items.map((o: any) => o.seller)
+  return ids.filter(
+    (id: any, index: any) => !ids.includes(id, index + 1),
+  )
+}
+
 //Create Document Invoice
 async function createDocumentInvoice(
   data: any,
   account: string,
-  customFields: any
+  customFields: any,
 ) {
   const options = {
     method: 'POST',
@@ -106,11 +109,11 @@ async function createDocumentInvoice(
   }
   const invoice_document = await axios
     .request(options)
-    .then(function (response: any) {
+    .then(function(response: any) {
       console.log('create document for invoice : ', response.data)
       return response.data
     })
-    .catch(function (error: any) {
+    .catch(function(error: any) {
       console.error(error)
     })
   return invoice_document
@@ -121,7 +124,7 @@ async function getOrderDetails(
   orderId: any,
   account: string,
   customFields: any,
-  ctx: any
+  ctx: any,
 ) {
   const options = {
     method: 'GET',
@@ -135,31 +138,32 @@ async function getOrderDetails(
   }
   const orderDetails = await axios
     .request(options)
-    .then(function (response: any) {
+    .then(function(response: any) {
       console.log(response.data)
       return response.data
     })
-    .catch(function (error: any) {
+    .catch(function(error: any) {
       console.log(error)
       return error
     })
-  // console.log('orderDetails=====>', orderDetails)
+  console.log('orderDetails=====>', orderDetails)
 
   const newBuyerOrderDetails: any = await getBuyerInvoiceDetails(
     orderId,
     account,
     customFields,
-    ctx
+    ctx,
   )
   console.log('New buyer Order Details ========>', newBuyerOrderDetails)
   return orderDetails
 }
+
 //get Buyer order details
 const getBuyerInvoiceDetails = async (
   orderId: any,
   account: string,
   customFields: any,
-  ctx: any
+  ctx: any,
 ) => {
   console.log('getBuyerInvoiceDetails was called')
 
@@ -179,18 +183,30 @@ const getBuyerInvoiceDetails = async (
   let saveToVbaseResponse
   const orderDetails = await axios
     .request(options)
-    .then(function (response: any) {
+    .then(function(response: any) {
       console.log('order details response----->', response.data)
       return response.data
     })
-    .catch(function (error: any) {
+    .catch(function(error: any) {
       console.log(error)
     })
 
   const vbaseOrderDetails: any = await getVbaseData(ctx, newOrderId[0])
-
+  console.log({ vbaseOrderDetails })
+  let shippingData = orderDetails.shippingData
+  let invoiceData = {
+    status: orderDetails.status,
+    name:
+      orderDetails.clientProfileData.firstName +
+      ' ' +
+      orderDetails.clientProfileData.lastName,
+    email: orderDetails.clientProfileData.email,
+    creationDate: orderDetails.creationDate,
+    // soldBy: orderDetails.sellers[0].name,
+    lastChange: orderDetails.lastChange,
+  }
   if (vbaseOrderDetails != null) {
-    let shippingData = orderDetails.shippingData
+
     let changeobj: any = orderDetails.items.map((data: any) => ({
       name: data.name,
       price: data.price,
@@ -203,27 +219,20 @@ const getBuyerInvoiceDetails = async (
     vbaseOrderDetails[newOrderId[1]] = { items: changeobj }
     vbaseOrderDetails[newOrderId[1]].totals = orderDetails.totals
     vbaseOrderDetails[newOrderId[1]].grandTotal = orderDetails.value
+    vbaseOrderDetails[newOrderId[1]].sellers = orderDetails.sellers
     vbaseOrderDetails['shippingData'] = shippingData
 
-    vbaseOrderDetails['orderId'] = orderDetails.orderId.split('-')[0]
-    vbaseOrderDetails['newInvoiceData'] = {
-      status: orderDetails.status,
-      name:
-        orderDetails.clientProfileData.firstName +
-        ' ' +
-        orderDetails.clientProfileData.lastName,
-      email: orderDetails.clientProfileData.email,
-      creationDate: orderDetails.creationDate,
-      soldBy: orderDetails.sellers[0].name,
-      lastChange: orderDetails.lastChange,
-    }
+    console.log('orderDetails.sellers===>', orderDetails.sellers, 'seller==>', orderDetails.sellers[0].name)
 
-    // console.log('Order Id save-->', newOrderId[0])
+    vbaseOrderDetails['orderId'] = orderDetails.orderId.split('-')[0]
+    vbaseOrderDetails['newInvoiceData'] = invoiceData
+
+    console.log('Order Id save in order webhook-->', newOrderId[0])
 
     saveToVbaseResponse = await saveVbaseData(
       newOrderId[0],
       vbaseOrderDetails,
-      ctx
+      ctx,
     )
   } else {
     let saveObj: any = {}
@@ -239,8 +248,11 @@ const getBuyerInvoiceDetails = async (
     saveObj[newOrderId[1]] = { items: items }
     saveObj[newOrderId[1]].totals = orderDetails.totals
     saveObj[newOrderId[1]].grandTotal = orderDetails.value
+    saveObj[newOrderId[1]].sellers = orderDetails.sellers
+    saveObj['shippingData'] = shippingData
+    saveObj['newInvoiceData'] = invoiceData
     console.log('Order Id save-->', newOrderId[0])
-
+    console.log({ saveObj })
     saveToVbaseResponse = await saveVbaseData(newOrderId[0], saveObj, ctx)
   }
   console.log('Order Id save-->', newOrderId[0])
@@ -265,9 +277,12 @@ async function notifyBuyer(
   account: string,
   invoiceNo: string,
   customFields: any,
-  workspace:any
+  workspace: any,
 ) {
-  console.log('the order id is : ' + orderId + ' the account is : ' + account)
+  console.log(
+    'the order id is : ' + orderId + ' the account is : ' + account,
+    workspace,
+  )
 
   const options = {
     method: 'POST',
@@ -294,11 +309,11 @@ async function notifyBuyer(
 
   const emailRes = await axios
     .request(options)
-    .then(function (response: any) {
+    .then(function(response: any) {
       console.log(response.data)
       return response.data
     })
-    .catch(function (error: any) {
+    .catch(function(error: any) {
       console.log(error)
     })
   // console.log('buyer email res', emailRes)
@@ -311,9 +326,12 @@ async function notifySeller(
   account: string,
   invoiceNo: string,
   customFields: any,
-  workspace:any
+  workspace: any,
 ) {
-  console.log('the order id is : ' + orderId + ' the account is : ' + account)
+  console.log(
+    'the order id is : ' + orderId + ' the account is : ' + account,
+    workspace,
+  )
   const options = {
     method: 'POST',
     url: `https://${account}.${constants.VTEX_COMMERCE_BASE_URL}/mail-service/pvt/sendmail`,
@@ -338,11 +356,11 @@ async function notifySeller(
 
   const emailRes = await axios
     .request(options)
-    .then(function (response: any) {
+    .then(function(response: any) {
       console.log(response.data)
       return response.data
     })
-    .catch(function (error: any) {
+    .catch(function(error: any) {
       console.log(error)
     })
   return emailRes
@@ -351,7 +369,7 @@ async function notifySeller(
 export async function getSellerEmailById(
   sellerIds: any,
   account: string,
-  customFields: any
+  customFields: any,
 ) {
   const sellerEmails = []
   for (let seller of sellerIds) {
@@ -368,14 +386,14 @@ export async function getSellerEmailById(
 
     const email = await axios
       .request(options)
-      .then(function (response: any) {
+      .then(function(response: any) {
         console.log(
           'getSellerInfo =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=->',
-          response.data
+          response.data,
         )
         return response.data.Email
       })
-      .catch(function (error: any) {
+      .catch(function(error: any) {
         console.log(error)
       })
     sellerEmails.push({ email: email, sellerId: seller })

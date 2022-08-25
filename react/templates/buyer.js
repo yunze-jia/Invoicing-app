@@ -55,7 +55,12 @@ export const BuyerTemplate = ({ body }) => {
   console.log('NewLogo=========>', logo)
 
   const downloadPdf = () => {
-    window.print()
+    try {
+      // Print for Safari browser
+      document.execCommand('print', false, null)
+    } catch {
+      window.print()
+    }
   }
 
   console.log(order)
@@ -156,24 +161,26 @@ export const BuyerTemplate = ({ body }) => {
                     <div>
                       <p
                         className={styles.status}
-                      >{`${order.vbase.newInvoiceData?.status}`}</p>
+                      >{`${order.vbase?.newInvoiceData?.status}`}</p>
                     </div>
                   </div>
                   <div className={styles.fontOuter}>
-                    <div className={styles.fontInner}>
+                    {/* <div className={styles.fontInner}>
                       <p>Placed on</p>
                     </div>
                     <div>
                       <p>{`${placedDate[2]} ${placedDate[1]} ${placedDate[3]} at ${placedDate[4]}`}</p>
-                    </div>
+                    </div> */}
                   </div>
                   <div className={styles.fontOuter}>
-                    <div className={styles.fontInner}>
+                    {/* <div className={styles.fontInner}>
                       <p>Sold by</p>
                     </div>
                     <div>
-                      <p>{`${order.vbase.newInvoiceData?.soldBy}`}</p>
-                    </div>
+                       <p>{`${newOrder?.sellers?.map((seller)=>seller.name)}`}</p>
+                       <p>{`${order?.data?.sellers?.map((data)=>(data?.name))}`}</p>
+                       <p>{`${order.vbase.newInvoiceData?.soldBy}`}</p>
+                    </div> */}
                   </div>
                   <div className={styles.fontOuter}>
                     <div className={styles.fontInner}>
@@ -200,11 +207,11 @@ export const BuyerTemplate = ({ body }) => {
                     alignItems: 'flex-end',
                   }}
                 >
-                  <div style={{ height: '20%' }}>
+                  {/* <div style={{ height: '20%' }}>
                     <b
                       className={styles.orderStyle}
-                    >{`${order.vbase.newInvoiceData.name}`}</b>
-                  </div>
+                    >{`${order?.vbase?.newInvoiceData?.name}`}</b>
+                  </div> */}
                   <div
                     style={{
                       display: 'flex',
@@ -291,7 +298,7 @@ export const BuyerTemplate = ({ body }) => {
                     <p style={{ color: '#979899' }}>Shipping</p>
                     <p style={{ color: '#979899' }}>
                       {`${(
-                        order.vbase.shippingData.logisticsInfo[0].price / 100
+                        order.vbase?.shippingData?.logisticsInfo[0].price / 100
                       ).toFixed(2)}`}
                     </p>
                   </div>

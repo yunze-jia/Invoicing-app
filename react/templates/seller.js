@@ -29,7 +29,12 @@ export const SellerTemplate = ({ body }) => {
 
   console.log(order)
   const downloadPdf = () => {
-    window.print()
+    try {
+      // Print for Safari browser
+      document.execCommand('print', false, null)
+    } catch {
+      window.print()
+    }
   }
 
   const getPlacedDate = (placed) => {
@@ -110,20 +115,20 @@ export const SellerTemplate = ({ body }) => {
             <b className={styles.orderStyle}>{`Order ${order?.orderId}`}</b>
           </div>
           <div className={styles.statusFontOuter}>
-            <div className={styles.fontInner}>
+            {/* <div className={styles.fontInner}>
               <p style={{ color: '#979899' }}>status</p>
             </div>
             <div>
               <p className={styles.status}>{`${order?.status}`}</p>
-            </div>
+            </div> */}
           </div>
           <div className={styles.fontOuter}>
-            <div className={styles.fontInner}>
+            {/* <div className={styles.fontInner}>
               <p>Placed on</p>
             </div>
             <div>
               <p>{getPlacedDate(order?.creationDate)}</p>
-            </div>
+            </div> */}
           </div>
           <div className={styles.fontOuter}>
             <div className={styles.fontInner}>

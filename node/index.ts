@@ -55,7 +55,7 @@ export default new Service({
       POST: [ordersWebhook],
     }),
     createOrderHooks: method({
-      POST: [orderHooks],
+      GET: [orderHooks],
    }),
     getOrder:method(({
       POST:[getOrderDetails]
