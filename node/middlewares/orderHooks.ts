@@ -3,7 +3,7 @@ const axios = require("axios");
 export async function orderHooks(ctx: any, next: () => Promise<any>) {
     console.log(ctx.req)
     const workspace = ctx.req.headers['x-vtex-workspace']
-    // console.log("workspace=======>",workspace)
+    console.log("workspace=======>",workspace)
     const options = {
         method: 'POST',
         url: 'https://vtexasia.myvtex.com.br/api/orders/hook/config',
@@ -33,7 +33,7 @@ export async function orderHooks(ctx: any, next: () => Promise<any>) {
         ctx.status = 200
         ctx.body = response.data
     }).catch(function (error: any) {
-        console.error(error);
+        console.error(error.response);
         ctx.status = 404
         ctx.body = error
     });

@@ -4,13 +4,18 @@ import { getVbaseData, saveVbaseData } from './vbase'
 
 const axios = require('axios')
 
-// export async function ordersWebhook(ctx: any){
-//     console.log('I am in order webhooks')
-//     ctx.status = 200;
-//     ctx.body = ctx.req;
-// }
 
 export async function ordersWebhook(ctx: any) {
+  const payload: any = await json(ctx.req)
+  console.log('the payload is  : ', payload)
+
+  //Checking if order hook is created for the first time.
+  //if first time , then send success status (As order hooks is sending a test request to check if endpoint exists)
+  if (payload.hookConfig && payload.hookConfig === 'ping') {
+    ctx.status = 200
+    ctx.body = ctx.req
+    return
+  }
   const {
     vtex: { account },
     clients: { apps },
@@ -19,8 +24,6 @@ export async function ordersWebhook(ctx: any) {
   const workspace = ctx.req.headers['x-vtex-workspace']
   console.log('workspace=======>', workspace)
   try {
-    const payload: any = await json(ctx.req)
-    console.log('the payload is  : ', payload)
     //
     if (!payload) {
       ctx.status = 200
@@ -53,7 +56,7 @@ export async function ordersWebhook(ctx: any) {
     const invoiceNumber: any = await createDocumentInvoice(
       body,
       account,
-      customFields
+      customFields,
     )
     if (payload.OrderId.split('-')[1] === '01') {
       const buyerDetails = await notifyBuyer(
@@ -62,7 +65,7 @@ export async function ordersWebhook(ctx: any) {
         account,
         invoiceNumber.DocumentId,
         customFields,
-        workspace
+        workspace,
       )
       console.log(buyerDetails)
     }
@@ -73,7 +76,7 @@ export async function ordersWebhook(ctx: any) {
         account,
         invoiceNumber.DocumentId,
         customFields,
-        workspace
+        workspace,
       )
     })
     return
@@ -185,6 +188,7 @@ const getBuyerInvoiceDetails = async (
     .request(options)
     .then(function(response: any) {
       console.log('order details response----->', response.data)
+      console.log('shippingdata --> ', JSON.stringify(response.data.shippingData.logisticsInfo) )
       return response.data
     })
     .catch(function(error: any) {
@@ -214,6 +218,7 @@ const getBuyerInvoiceDetails = async (
       priceDefinition: data.priceDefinition,
       unitPrice: data.sellingPrice,
       orderCommission: data.commission,
+      refId: data.refId,
     }))
 
     vbaseOrderDetails[newOrderId[1]] = { items: changeobj }
@@ -251,6 +256,7 @@ const getBuyerInvoiceDetails = async (
     saveObj[newOrderId[1]].sellers = orderDetails.sellers
     saveObj['shippingData'] = shippingData
     saveObj['newInvoiceData'] = invoiceData
+    saveObj['orderId'] = orderDetails.orderId.split('-')[0]
     console.log('Order Id save-->', newOrderId[0])
     console.log({ saveObj })
     saveToVbaseResponse = await saveVbaseData(newOrderId[0], saveObj, ctx)

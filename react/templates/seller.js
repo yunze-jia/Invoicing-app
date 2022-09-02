@@ -256,7 +256,7 @@ export const SellerTemplate = ({ body }) => {
                       }`} */}
             </p>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div  style={{ display: order?.items?.map((data) => (data.commission !== 0 ? 'flex':'none' ))  , justifyContent: 'space-between' }}>
             <p style={{ color: '#979899' }}>Order comission </p>
             <p style={{ color: '#979899' }}>
               {`  ${order?.items?.map((data) => (data.commission/100).toFixed(2))}`}
@@ -281,7 +281,7 @@ export const SellerTemplate = ({ body }) => {
           }}
         >
           <p>Grand Total</p>
-          {/* <p>{`${grandTotals}`}</p> */}
+           <p>{`${grandTotals}`}</p>
         </div>
       </div>
     </div>

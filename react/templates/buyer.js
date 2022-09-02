@@ -165,22 +165,22 @@ export const BuyerTemplate = ({ body }) => {
                     </div>
                   </div>
                   <div className={styles.fontOuter}>
-                    {/* <div className={styles.fontInner}>
+                    <div className={styles.fontInner}>
                       <p>Placed on</p>
                     </div>
                     <div>
                       <p>{`${placedDate[2]} ${placedDate[1]} ${placedDate[3]} at ${placedDate[4]}`}</p>
-                    </div> */}
+                    </div>
                   </div>
                   <div className={styles.fontOuter}>
-                    {/* <div className={styles.fontInner}>
+                    <div className={styles.fontInner}>
                       <p>Sold by</p>
                     </div>
                     <div>
                        <p>{`${newOrder?.sellers?.map((seller)=>seller.name)}`}</p>
-                       <p>{`${order?.data?.sellers?.map((data)=>(data?.name))}`}</p>
-                       <p>{`${order.vbase.newInvoiceData?.soldBy}`}</p>
-                    </div> */}
+                       {/* <p>{`${order?.data?.sellers?.map((data)=>(data?.name))}`}</p> */}
+                       {/* <p>{`${order.vbase.newInvoiceData?.soldBy}`}</p> */}
+                    </div>
                   </div>
                   <div className={styles.fontOuter}>
                     <div className={styles.fontInner}>
