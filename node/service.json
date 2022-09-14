@@ -4,7 +4,7 @@
   "timeout": 2,
   "minReplicas": 2,
   "maxReplicas": 4,
-  "workers": 1,
+  "workers": 4,
   "routes": {
     "ordersWebhook": {
       "path": "/_v/ordersWebhook",
@@ -21,6 +21,18 @@
     "getOrder": {
       "path": "/_v/order/:orderId",
       "public": true
+    },
+    "buyerInvoice":{
+      "path":"/_v/orders/buyerxa/:orderId",
+      "public":true
+    },
+    "sellerInvoiceInfo":{
+      "path":"/_v/orders/seller/:sellerId",
+      "public":true
+    },
+    "buyerEncrptEnvoice":{
+      "path":"/_v/orders/buyerEncrptEmails/:orderId", 
+      "public":true
     }
   }
 }
