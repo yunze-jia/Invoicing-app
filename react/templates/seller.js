@@ -62,20 +62,18 @@ export const SellerTemplate = ({ body }) => {
     return total
   }
   const CalculateDiscount = (order) => {
-    //calculating Discount
-    return (
-      -order?.totals?.filter((totals, index) => {
-        if (totals.id === 'Discounts')
-          return (discount = totals.value + (index === 2 ? discount : 0)) / 100
-      })[0].value / 100
-    )
+    let calculatedDiscount = order?.totals?.filter((totals, index) => {
+      if (totals.id === 'Discounts')
+        return (discount = totals.value + (index === 2 ? discount : 0)) / 100
+    });
+    return typeof calculatedDiscount === "undefined" || typeof calculatedDiscount === "object" ? 0 : calculatedDiscount[0].value / 100
   }
 
   const calculateShippingCharge = (order) => {
     const newShipingCharge = order?.totals?.find(
       (shipping) => shipping.id === 'Shipping'
-    ).value
-    return (newShipingCharge / 100).toFixed(2)
+    )?.value
+    return (newShipingCharge ? newShipingCharge : 0 / 100).toFixed(2)
   }
 
   return (

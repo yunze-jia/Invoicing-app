@@ -1,7 +1,7 @@
 {
-  "name": "native-invoicing-app-theme",
+  "name": "native-invoicing-app",
   "vendor": "vtexasia",
-  "version": "1.0.2",
+  "version": "2.0.4",
   "title": "Native Invoicing Application",
   "description": "Sending the invoice email to both Buyer and Seller ",
   "mustUpdateAt": "2018-01-04",
@@ -12,6 +12,9 @@
     "react": "3.x",
     "node": "6.x",
     "docs": "0.x"
+  },
+  "billingOptions": {
+    "type": "free"
   },
   "scripts": {
     "prereleasy": "bash lint.sh"
@@ -54,8 +57,8 @@
     {
       "name": "outbound-access",
       "attrs": {
-        "host": "vtexasia.vtexcommercestable.com.br",
-        "path": "*"
+        "host": "{{account}}.vtexcommercestable.com.br",
+        "path": "/*"
       }
     },
     {
@@ -68,7 +71,7 @@
     {
       "name": "outbound-access",
       "attrs": {
-        "host": "vtexasia.myvtex.com.br",
+        "host": "{{account}}.myvtex.com.br",
         "path": "*"
       }
     },
@@ -80,6 +83,9 @@
     },
     {
       "name": "vbase-read-write"
+    },
+    {
+      "name": "ADMIN_DS"
     }
   ],
   "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"

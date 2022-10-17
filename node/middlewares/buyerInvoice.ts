@@ -9,13 +9,13 @@ export async function getBuyerInvoiceDetails(ctx:any){
     
     const {
         vtex:{
-            account
+            account,authToken
         },
         clients:{
             apps
         }
     }=ctx;
-    console.log(account)
+    console.log({account,authToken})
     const appId = process.env.VTEX_APP_ID as string
     console.log(appId)
     const customFields = await apps.getAppSettings(appId)
@@ -26,8 +26,10 @@ export async function getBuyerInvoiceDetails(ctx:any){
         headers:{
             Accept:'application/json',
             'Content-type':'application/json',
-            'X-VTEX-API-AppKey':'vtexappkey-vtexasia-SFAJSB',
-            'X-VTEX-API-AppToken':'ZOLHOEDDEIIPWMNCAPAEGVLKXUBVXUZKCQFHZHFWZQZLITBXPUPBCBZEDBJUCHGJJXMFGFCSJDEPWZBESDGCFXIBQBEYXLTSKPCKGVQJRWRYWKIDZFBYBDELPKOEBEVY'
+            // "X-VTEX-Use-Https": "true",
+            // 'VtexIdclientAutCookie':authToken
+            'X-VTEX-API-AppKey':customFields.app_key,
+            'X-VTEX-API-AppToken':customFields.app_token
         }
     };
     // console.log('orderId',newOrderId.split("-")[0])

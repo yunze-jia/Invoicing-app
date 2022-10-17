@@ -4,6 +4,59 @@ import { getVbaseData, saveVbaseData } from './vbase'
 
 const axios = require('axios')
 
+function getStartAndEndDate(){
+  const date = new Date();
+  let startDateTime ;
+  let endDateTime;
+  let startdays = 7;
+  let start = new Date(date.getTime() - (startdays * 24 * 60 * 60 * 1000));
+  startDateTime = start.getFullYear() + '-' + (start.getMonth() + 1) + '-' + (start.getDate()) +'T00:00:00.000Z';
+  let enddays = 1;
+  let end = new Date(date.getTime() + (enddays * 24 * 60 * 60 * 1000));
+  endDateTime = end.getFullYear() + '-' + (end.getMonth() + 1) + '-' + (end.getDate() ) +'T00:00:00.000Z';
+  return {startDateTime, endDateTime}
+
+}
+
+export async function getOrdersList(groupId:any,authToken:any, customFields:any){
+  console.log('auth token while getting orders list',authToken)
+  console.log('custom fields while getting orders list',customFields)
+const dates = getStartAndEndDate();
+let count = 0;
+const options = {
+  method: 'GET',
+  url: `http://vtexasia.vtexcommercestable.com.br/api/oms/pvt/orders?f_creationDate=creationDate:[${dates.startDateTime} TO ${dates.endDateTime}]&f_hasInputInvoice=false`,
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+    "X-VTEX-Use-Https": "true", 
+    'VtexIdclientAutCookie':authToken
+    // 'X-VTEX-API-AppKey': customFields.app_key,
+    // 'X-VTEX-API-AppToken': customFields.app_token
+  }
+};
+
+const list = await axios
+  .request(options)
+  .then(function (response:any) {
+    // console.log('Order List : ',response.data);
+    return {isError:false,payload:response.data}
+  })
+  .catch(function (error:any) {
+    console.error('ERROR IN ORDER LIST',error.response);
+    return {isError:false,payload:error.response};
+  });
+if(list.isError){
+  return list.payload;
+}
+  list.list.map((res:any)=>{
+    if(res.orderId.split('-')[0] === groupId){
+      count++;
+      return
+    }
+  })
+  return count;
+}
 
 export async function ordersWebhook(ctx: any) {
   const payload: any = await json(ctx.req)
@@ -17,7 +70,7 @@ export async function ordersWebhook(ctx: any) {
     return
   }
   const {
-    vtex: { account },
+    vtex: { account, authToken },
     clients: { apps },
   } = ctx
   ctx.status = 200
@@ -58,7 +111,10 @@ export async function ordersWebhook(ctx: any) {
       account,
       customFields,
     )
-    if (payload.OrderId.split('-')[1] === '01') {
+    // if (payload.OrderId.split('-')[1] === '01') {
+      let noOfSellers = await getOrdersList(payload.OrderId.split('-')[0],authToken,customFields)
+      console.log('SELLER IDS LENGTH - '+ noOfSellers + 'no of orders invoiced - ' + orderDetails.noOfOrdersInvoiced)
+      if (noOfSellers === orderDetails.noOfOrdersInvoiced || noOfSellers === 1) {
       const buyerDetails = await notifyBuyer(
         payload.OrderId,
         orderDetails.clientProfileData.email,
@@ -66,6 +122,7 @@ export async function ordersWebhook(ctx: any) {
         invoiceNumber.DocumentId,
         customFields,
         workspace,
+        authToken
       )
       console.log(buyerDetails)
     }
@@ -77,6 +134,7 @@ export async function ordersWebhook(ctx: any) {
         invoiceNumber.DocumentId,
         customFields,
         workspace,
+        authToken
       )
     })
     return
@@ -158,7 +216,8 @@ async function getOrderDetails(
     ctx,
   )
   console.log('New buyer Order Details ========>', newBuyerOrderDetails)
-  return orderDetails
+  orderDetails.noOfOrdersInvoiced = newBuyerOrderDetails.noOfOrdersInvoiced;
+  return orderDetails;
 }
 
 //get Buyer order details
@@ -273,7 +332,12 @@ const getBuyerInvoiceDetails = async (
     vbaseOrderDetails,
     vbaseOrderDetails1,
   })
-
+   
+  orderDetails.noOfOrdersInvoiced = (vbaseOrderDetails && Object.keys(vbaseOrderDetails).filter((res:any)=>{
+    if(!isNaN(res)) return res;
+  }).length )?? 0;
+  console.log('NoOFordersINvoiced created - ',orderDetails.noOfOrdersInvoiced);
+  
   return orderDetails
 }
 
@@ -284,6 +348,7 @@ async function notifyBuyer(
   invoiceNo: string,
   customFields: any,
   workspace: any,
+  authToken:any
 ) {
   console.log(
     'the order id is : ' + orderId + ' the account is : ' + account,
@@ -292,12 +357,15 @@ async function notifyBuyer(
 
   const options = {
     method: 'POST',
-    url: `https://${account}.${constants.VTEX_COMMERCE_BASE_URL}/mail-service/pvt/sendmail`,
+    url: `http://${account}.${constants.VTEX_COMMERCE_BASE_URL}/mail-service/pvt/sendmail`,
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      'X-VTEX-API-Appkey': customFields.app_key,
-      'X-VTEX-API-AppToken': customFields.app_token,
+      "X-VTEX-Use-Https": "true",
+      VtexIdClientAutCookie: authToken,
+
+      // 'X-VTEX-API-Appkey': customFields.app_key,
+      // 'X-VTEX-API-AppToken': customFields.app_token,
     },
     data: {
       TemplateName: 'order-confirmed',
@@ -333,6 +401,7 @@ async function notifySeller(
   invoiceNo: string,
   customFields: any,
   workspace: any,
+  authToken:any
 ) {
   console.log(
     'the order id is : ' + orderId + ' the account is : ' + account,
@@ -340,12 +409,14 @@ async function notifySeller(
   )
   const options = {
     method: 'POST',
-    url: `https://${account}.${constants.VTEX_COMMERCE_BASE_URL}/mail-service/pvt/sendmail`,
+    url: `http://${account}.${constants.VTEX_COMMERCE_BASE_URL}/mail-service/pvt/sendmail`,
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      'X-VTEX-API-AppKey': customFields.app_key,
-      'X-VTEX-API-AppToken': customFields.app_token,
+      "X-VTEX-Use-Https": "true",
+      VtexIdClientAutCookie:authToken
+      // 'X-VTEX-API-AppKey': customFields.app_key,
+      // 'X-VTEX-API-AppToken': customFields.app_token,
     },
     data: {
       TemplateName: 'order-confirmed',

@@ -24,9 +24,9 @@ export async function getBuyerEmail(ctx: any) {
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
-        'X-VTEX-API-AppKey': 'vtexappkey-vtexasia-SFAJSB',
+        'X-VTEX-API-AppKey': 'vtexappkey-vtexasia-KNRKGW',
         'X-VTEX-API-AppToken':
-          'ZOLHOEDDEIIPWMNCAPAEGVLKXUBVXUZKCQFHZHFWZQZLITBXPUPBCBZEDBJUCHGJJXMFGFCSJDEPWZBESDGCFXIBQBEYXLTSKPCKGVQJRWRYWKIDZFBYBDELPKOEBEVY',
+          'VJKMVGWEPZUNZVORVYBWIHJCFESHDTUNBJYKDPMJHDUZUAWGGTHIELXSCYEIPJDSJTJENUSGHWYALSSYGOFONJAFINIRVEPDCOYHNACMRDDNMGFIBPNYRANQXUMPHOXR',
       },
     }
     let res = await axios.request(buyerEmail)
