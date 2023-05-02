@@ -1,4 +1,3 @@
-import { constants } from '../../node/utils/constant'
 import axios from 'axios'
 import React from 'react'
 
@@ -9,12 +8,10 @@ export const getOrderDetails = async (orderId, invoiceUrl, type, sellerId) => {
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      'X-VTEX-API-AppKey': constants.APP_KEY,
-      'X-VTEX-API-AppToken': constants.APP_TOKEN,
     },
   }
 
-  const orderDetails = await axios
+  let orderDetails = await axios
     .request(options)
     .then(function (response) {
       console.log(response.data)
@@ -23,6 +20,7 @@ export const getOrderDetails = async (orderId, invoiceUrl, type, sellerId) => {
     .catch(function (error) {
       console.log(error)
     })
+    debugger
   // let invoiceNumber = await generateInvoiceNumber(orderDetails.orderId);
   orderDetails.invoiceNumber = invoiceUrl
   //  = orderDetails.items
@@ -48,7 +46,7 @@ const createTableProducts = async (items) => {
   let total = null
   const htmlItems = items.map((data) => {
     grand = data.grandTotal + grand
-
+    debugger
     data.totals?.map((totals) => {
       if (totals.id === 'Discounts') return (discount = totals.value + discount)
     })
@@ -68,6 +66,7 @@ const createTableProducts = async (items) => {
       )
     })
   })
+  debugger
   return { htmlItems, grand, discount, total }
 }
 
@@ -79,12 +78,10 @@ export const getNewBuyerOrderDetails = async (
 ) => {
   const options = {
     method: 'GET',
-    url: `/_v/orders/buyerxa/${orderId}`,
+    url: `/_v/orders/buyer/${orderId}`,
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      'X-VTEX-API-AppKey': constants.APP_KEY,
-      'X-VTEX-API-AppToken': constants.APP_TOKEN,
     },
   }
   const orderDetails = await axios
@@ -99,16 +96,14 @@ export const getNewBuyerOrderDetails = async (
   orderDetails.invoiceNumber = invoiceUrl
   const buyer = orderDetails.vbase
   let seller = []
-  Object.keys(orderDetails.vbase).map((key) => {
-    if (!isNaN(parseInt(key))) {
-      seller.push(orderDetails.vbase[key])
-    }
-  })
+  if(buyer){
+    Object.keys(orderDetails.vbase).map((key) => {
+      if (!isNaN(parseInt(key))) {
+        seller.push(orderDetails.vbase[key])
+      }
+    })
+  }
   seller = seller.flat(2)
-
-  console.log(seller)
-
-  console.log('final api call=====================>', orderDetails, seller)
   let items = await createTableProducts(seller)
   orderDetails.htmlItems = items
   return orderDetails
@@ -119,13 +114,12 @@ export const getSellerInfo = async (sellerId) => {
     url: `/_v/orders/seller/${sellerId}`,
     headers: {
       Accept: 'application/json',
-      'Content-Type': 'application/json',
-      'X-VTEX-API-AppKey': constants.APP_KEY,
-      'X-VTEX-API-AppToken': constants.APP_TOKEN,
+      'Content-Type': 'application/json'
     },
   }
 
   const email = await axios.request(options)
+  debugger
   if (email) {
     return email.data
   } else {
@@ -139,8 +133,6 @@ export const getBuyerDecEmail = async (orderId) => {
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      'X-VTEX-API-AppKey': constants.APP_KEY,
-      'X-VTEX-API-AppToken': constants.APP_TOKEN,
     },
   }
 

@@ -6,7 +6,7 @@ const styles = require('../index.css')
 
 export const SellerTemplate = ({ body }) => {
   const orderId = body.params ? body.params.order_id : null
-  const invoiceUrl = body.params ? body.params.invoice_url : null
+  let invoiceUrl = body.params ? body.params.invoice_url : null
   const type = body.params ? body.params.type : null
   const sellerId = body.params ? body.params.seller_id : null
   // const orderDetails =  await getOrderDetails(orderId,"vtexasia")
@@ -73,7 +73,7 @@ export const SellerTemplate = ({ body }) => {
     const newShipingCharge = order?.totals?.find(
       (shipping) => shipping.id === 'Shipping'
     )?.value
-    return (newShipingCharge ? newShipingCharge : 0 / 100).toFixed(2)
+    return ((newShipingCharge ? newShipingCharge : 0) / 100).toFixed(2)
   }
 
   return (
@@ -254,10 +254,13 @@ export const SellerTemplate = ({ body }) => {
                       }`} */}
             </p>
           </div>
-          <div  style={{ display: order?.items?.map((data) => (data.commission !== 0 ? 'flex':'none' ))  , justifyContent: 'space-between' }}>
-            <p style={{ color: '#979899' }}>Order comission </p>
+          <div  style={{ display: 'flex'  , justifyContent: 'space-between' }}>
+            <p style={{ color: '#979899' }}>Total Order comission </p>
             <p style={{ color: '#979899' }}>
-              {`  ${order?.items?.map((data) => (data.commission/100).toFixed(2))}`}
+              {/* {`  ${order?.items?.reduce((total,value) => {return (total + value.commission/100).toFixed(2)},0)}`} */}
+              {`  ${((order?.items?.reduce((total,value)=>{
+                  return total + value.commission
+              },0))/100).toFixed(2)}`}
             </p>
           </div>
         </div>

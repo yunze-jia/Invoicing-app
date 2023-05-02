@@ -24,7 +24,7 @@ export const BuyerTemplate = ({ body }) => {
   const [test, setTest] = useState(false)
   console.log(body)
   const orderId = body.params ? body.params.order_id : null
-  const invoiceUrl = body.params ? body.params.invoice_url : null
+  let invoiceUrl = body.params ? body.params.invoice_url : null
   const type = body.params ? body.params.type : null
   const sellerId = body.params ? body.params.sellerId : null
   // const orderDetails =  await getOrderDetails(orderId,"vtexasia")

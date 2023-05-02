@@ -23,9 +23,42 @@ Follow the instructions provided by the Native Invoicing App in the `Admin > Acc
 
 ![Getting Started](setting.png)
 
-After the set up, you need to create a hook to listen the payment status. Make a GET request to following endpoint.
+After the set up, you need to create a hook to listen the payment status. Make a cURL request to following endpoint.
 
-https://${workspace}--vtexasia.myvtex.com/_v/orderhooks/create
+<!-- https://${workspace}--{{account}}.myvtex.com/_v/orderhooks/create -->
+
+
+curl --request POST \
+ --url 'https://{accountName}.{environment}.com.br/api/orders/feed/config' \
+ --header "Accept: application/json" \
+ --header 'Content-Type: application/json' \
+ --header 'X-VTEX-API-AppKey: ' \
+ --header 'X-VTEX-API-AppToken: ' \
+ --data '{
+        "filter": {
+          "type": "FromWorkflow",
+          "status": ["invoiced"]
+        },
+        "queue": {
+          "visibilityTimeoutInSeconds": 240,
+          "messageRetentionPeriodInSeconds": 345600
+        },
+        "hook": {
+          "url": "https://{workspace}--{accountName}.myvtex.com/_v/ordersWebhook",
+          "headers": {
+            "key": "value"
+          }
+        }
+      }'
+
+Replace accountName with your vtex account name, environment is `vtexcommercestable`,X-VTEX-API-AppKey and X-VTEX-API-AppToken with appkey and apptoken generated from your stores admin panel. In the hook configuration replace accountName with vtex account name and the 
+workspace 
+
+Production ENV: 
+if we are using the app in production the workspace will be `master` or
+
+Development ENV: 
+The development workspace name where we have linked our app.
 
 
 >ℹ️ **Note**

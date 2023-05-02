@@ -1,7 +1,7 @@
 {
   "name": "native-invoicing-app",
   "vendor": "vtexasia",
-  "version": "2.0.4",
+  "version": "3.0.5",
   "title": "Native Invoicing Application",
   "description": "Sending the invoice email to both Buyer and Seller ",
   "mustUpdateAt": "2018-01-04",
@@ -14,7 +14,15 @@
     "docs": "0.x"
   },
   "billingOptions": {
-    "type": "free"
+    "termsURL": "https://compliance.vtex.com/gdpr/policies/vtex-privacy-policy",
+    "support": {
+      "url": "https://support.vtex.com/hc/requests"
+    },
+    "free": true,
+    "type": "free",
+    "availableCountries": [
+      "*"
+    ]
   },
   "scripts": {
     "prereleasy": "bash lint.sh"
@@ -50,6 +58,20 @@
     {
       "name": "outbound-access",
       "attrs": {
+        "host": "mailservice.vtex.com.br",
+        "path": "/api/mail-service/pvt/sendmail"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "api.vtex.com",
+        "path": "/api/*"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
         "host": "httpstat.us",
         "path": "*"
       }
@@ -76,6 +98,13 @@
       }
     },
     {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "portal.vtexcommercestable.com.br",
+        "path": "/api/oms/*"
+      }
+    },
+    {
       "name": "colossus-fire-event"
     },
     {
@@ -86,6 +115,12 @@
     },
     {
       "name": "ADMIN_DS"
+    },
+    {
+      "name": "OMSViewer"
+    },
+    {
+      "name": "POWER_USER_DS"
     }
   ],
   "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"

@@ -1,10 +1,10 @@
-import { getSellerEmailById } from '../middlewares/ordersWebhook'
+import { getSellerEmailById } from '../services/seller'
 
 export async function sellerInvoiceInfo(ctx: any) {
   const newSellerId: any = []
   newSellerId.push(ctx.vtex.route.params.sellerId)
   const {
-    vtex: { account },
+    vtex: { account,authToken },
     clients: { apps },
   } = ctx
   ctx.status = 200
@@ -13,6 +13,7 @@ export async function sellerInvoiceInfo(ctx: any) {
   const customFields = await apps.getAppSettings(appId)
   if (newSellerId) {
     const sellerInvoiceData = await getSellerEmailById(
+      authToken,
       newSellerId,
       account,
       customFields
