@@ -89,9 +89,10 @@ export const SellerTemplate = ({ body }) => {
           <img
             href="/"
             src={
-              logo.length != 0
-                ? logo[0]
-                : 'https://brand.vtex.com/wp-content/themes/vtex-brand/img/logo.svg'
+              // logo.length != 0
+              //   ? logo[0]
+              //   :
+                 'blob:https://docs.google.com/d70f6cca-d21c-4984-b2d5-823131b1eb0c'
             }
           />
         </div>

@@ -73,6 +73,7 @@ td {
 }
 
 .printButton {
+  float:right;
   background-color: #003df6;
   border: none;
   color: white;
@@ -107,7 +108,7 @@ td {
   display: flex;
   flex-direction: row;
   align-items: center;
-  color: #979899;
+  color: #292a2b;
 }
 .fontInner {
   width: 20%;
@@ -131,6 +132,13 @@ td {
   width: 24%
 }
 
+.logo{
+  width: 15% ;   
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
 .aaa {
   width: 70%;
 }
@@ -150,4 +158,39 @@ td {
   .totalStyle{
     width: 30%;
   }
+}
+
+
+.info{
+  display: grid;
+  margin-top: 10%;
+}
+
+.greeting{
+  margin: 10px;
+    font-family: 'Gordita';
+    font-weight: bold;
+}
+
+.textInfo{
+  margin: 5px;
+  font-size: 15px;
+}
+
+.flex{
+  display: flex;
+  align-items: center;
+}
+
+.leftmargin{
+      margin-left: 75px;
+}
+
+.taxinovicetext{
+  font-size: larger;
+    margin-bottom: 17px;
+}
+
+.invoiceinfo{
+  font-size: large;
 }

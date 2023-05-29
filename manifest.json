@@ -1,7 +1,7 @@
 {
   "name": "native-invoicing-app",
   "vendor": "vtexasia",
-  "version": "3.0.5",
+  "version": "4.0.8",
   "title": "Native Invoicing Application",
   "description": "Sending the invoice email to both Buyer and Seller ",
   "mustUpdateAt": "2018-01-04",
@@ -47,9 +47,9 @@
         "description": "used to send the invoice to the buyer and seller",
         "type": "string"
       },
-      "invoice_logo": {
-        "title": "invoice logo",
-        "description": "used to add the logo in invoices",
+      "logoUrl": {
+        "title": "invoice logo Url",
+        "description": "Add the url of logo you want to display. ",
         "type": "string"
       }
     }
@@ -67,6 +67,13 @@
       "attrs": {
         "host": "api.vtex.com",
         "path": "/api/*"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "app.io.vtex.com",
+        "path": "/*"
       }
     },
     {

@@ -96,7 +96,7 @@ export const getNewBuyerOrderDetails = async (
   orderDetails.invoiceNumber = invoiceUrl
   const buyer = orderDetails.vbase
   let seller = []
-  if(buyer){
+  if (buyer) {
     Object.keys(orderDetails.vbase).map((key) => {
       if (!isNaN(parseInt(key))) {
         seller.push(orderDetails.vbase[key])
@@ -114,7 +114,7 @@ export const getSellerInfo = async (sellerId) => {
     url: `/_v/orders/seller/${sellerId}`,
     headers: {
       Accept: 'application/json',
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
   }
 

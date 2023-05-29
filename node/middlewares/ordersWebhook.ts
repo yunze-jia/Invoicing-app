@@ -107,7 +107,7 @@ export async function ordersWebhook(ctx: any) {
       //   ctx.status = 500;
       // }
       // console.log('SELLER IDS LENGTH - '+ details.data + ' no of orders invoiced - ' + orderDetails.noOfOrdersInvoiced)
-      if (orderDetails.noOfSellers === orderDetails.noOfOrdersInvoiced || orderDetails.noOfSellers === 1) {
+      // if (orderDetails.noOfSellers === orderDetails.noOfOrdersInvoiced || orderDetails.noOfSellers === 1) {
         console.log('IN NOTIFY BUYER')
       const buyerDetails = await notifyBuyer(
         payload.OrderId,
@@ -119,7 +119,7 @@ export async function ordersWebhook(ctx: any) {
         ctx
       )
       console.log(buyerDetails)
-    }
+    // }
     sellerEmail.forEach(async (data: any) => {
       await notifySeller(
         payload.OrderId,

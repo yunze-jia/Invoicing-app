@@ -1,3 +1,4 @@
+import { getSKUSpecifications } from "../middlewares/specifications";
 import { getVbaseData, saveVbaseData } from "../middlewares/vbase";
 
 //
@@ -6,6 +7,9 @@ export const buildBuyerInvoiceInfo = async (
     ctx: any,
   ) => {
     const {
+      vtex:{
+        account,authToken
+      },
       clients : {orderClient}
     }=ctx;
     let saveToVbaseResponse
@@ -26,21 +30,37 @@ export const buildBuyerInvoiceInfo = async (
       lastChange: orderDetails.lastChange,
     }
     if (vbaseOrderDetails != null) {
+      let changeobj = []
+      for(const item of orderDetails.items){
+        changeobj.push({
+          id:item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          priceDefinition: item.priceDefinition,
+          unitPrice: item.sellingPrice,
+          orderCommission: item.commission,
+          refId: item.refId,
+          tax: item.tax,
+          description: await getSKUSpecifications(item.id,account,authToken)
+        })
+        
+      }
   
-      let changeobj: any = orderDetails.items.map((data: any) => ({
-        name: data.name,
-        price: data.price,
-        quantity: data.quantity,
-        priceDefinition: data.priceDefinition,
-        unitPrice: data.sellingPrice,
-        orderCommission: data.commission,
-        refId: data.refId,
-      }))
-  
+      // let changeobj: any = orderDetails.items.map((data: any) => ({
+      //   name: data.name,
+      //   price: data.price,
+      //   quantity: data.quantity,
+      //   priceDefinition: data.priceDefinition,
+      //   unitPrice: data.sellingPrice,
+      //   orderCommission: data.commission,
+      //   refId: data.refId,
+      // }))
       vbaseOrderDetails[newOrderId[1]] = { items: changeobj }
       vbaseOrderDetails[newOrderId[1]].totals = orderDetails.totals
       vbaseOrderDetails[newOrderId[1]].grandTotal = orderDetails.value
       vbaseOrderDetails[newOrderId[1]].sellers = orderDetails.sellers
+      vbaseOrderDetails[newOrderId[1]].invoiceNumber = orderDetails?.packageAttachment?.packages[0]?.invoiceNumber
       vbaseOrderDetails['shippingData'] = shippingData  
       vbaseOrderDetails['orderId'] = orderDetails.orderId.split('-')[0]
       vbaseOrderDetails['newInvoiceData'] = invoiceData
@@ -53,16 +73,33 @@ export const buildBuyerInvoiceInfo = async (
       )
     } else {
       let saveObj: any = {}
-      const items = orderDetails.items.map((data: any) => ({
-        name: data.name,
-        price: data.price,
-        quantity: data.quantity,
-        priceDefinition: data.priceDefinition,
-        unitPrice: data.sellingPrice,
-        orderCommission: data.commission,
-        refId: data.refId,
-      }))
+      let items = []
+      for(const item of orderDetails.items){
+        items.push({
+          id:item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          priceDefinition: item.priceDefinition,
+          unitPrice: item.sellingPrice,
+          orderCommission: item.commission,
+          refId: item.refId,
+          tax: item.tax,
+          description: await getSKUSpecifications(item.id,account,authToken)
+        })
+        
+      }
+      // const items = orderDetails.items.map((data: any) => ({
+      //   name: data.name,
+      //   price: data.price,
+      //   quantity: data.quantity,
+      //   priceDefinition: data.priceDefinition,
+      //   unitPrice: data.sellingPrice,
+      //   orderCommission: data.commission,
+      //   refId: data.refId,
+      // }))
       saveObj[newOrderId[1]] = { items: items }
+      saveObj[newOrderId[1]].invoiceNumber = orderDetails?.packageAttachment?.packages[0]?.invoiceNumber
       saveObj[newOrderId[1]].totals = orderDetails.totals
       saveObj[newOrderId[1]].grandTotal = orderDetails.value
       saveObj[newOrderId[1]].sellers = orderDetails.sellers
