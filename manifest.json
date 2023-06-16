@@ -1,12 +1,14 @@
 {
   "name": "native-invoicing-app",
   "vendor": "vtexasia",
-  "version": "4.0.8",
+  "version": "4.0.17",
   "title": "Native Invoicing Application",
   "description": "Sending the invoice email to both Buyer and Seller ",
   "mustUpdateAt": "2018-01-04",
   "categories": [],
-  "dependencies": {},
+  "dependencies": {
+    "vtex.broadcaster-worker": "0.x"
+  },
   "builders": {
     "store": "0.x",
     "react": "3.x",
@@ -20,9 +22,7 @@
     },
     "free": true,
     "type": "free",
-    "availableCountries": [
-      "*"
-    ]
+    "availableCountries": ["*"]
   },
   "scripts": {
     "prereleasy": "bash lint.sh"
@@ -50,6 +50,16 @@
       "logoUrl": {
         "title": "invoice logo Url",
         "description": "Add the url of logo you want to display. ",
+        "type": "string"
+      },
+      "username": {
+        "title": "Username",
+        "description": "Username for mongodb authentication. ",
+        "type": "string"
+      },
+      "password": {
+        "title": "Password",
+        "description": "Password for mongodb authentication ",
         "type": "string"
       }
     }
@@ -102,6 +112,13 @@
       "attrs": {
         "host": "{{account}}.myvtex.com.br",
         "path": "*"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "ec2-13-211-128-127.ap-southeast-2.compute.amazonaws.com",
+        "path": "/*"
       }
     },
     {

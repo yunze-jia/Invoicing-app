@@ -34,10 +34,6 @@
       "path": "/_v/orders/buyerEncrptEmails/:orderId",
       "public": true
     },
-    "getusers": {
-      "path": "/_v/user1",
-      "public": true
-    },
     "notifyBuyer": {
       "path": "/_v/notify/buyer",
       "public": true

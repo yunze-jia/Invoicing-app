@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-key */
 import React, { useEffect, useState } from 'react'
 import { getBuyerDecEmail, getNewBuyerOrderDetails } from '../services/order'
 const styles = require('../index.css')
@@ -21,17 +22,10 @@ export const BuyerTemplate = ({ body }) => {
   let invoiceUrl = body.params ? body.params.invoice_url : null
   const type = body.params ? body.params.type : null
   const sellerId = body.params ? body.params.sellerId : null
-  // const orderDetails =  await getOrderDetails(orderId,"vtexasia")
   const [order, setOrder] = useState([])
   const [email, setEmail] = useState([])
   const [logo, setLogo] = useState([])
   useEffect(() => {
-    // async function setOrderDetails() {
-    //     if (orderId) {
-    //         setOrder(await getOrderDetails(orderId, invoiceUrl, type, sellerId));
-    //     }
-    // }
-
     setOrderDetails()
     setInterval(getLogo(setLogo, logo), 2000)
   }, [])
@@ -40,6 +34,7 @@ export const BuyerTemplate = ({ body }) => {
       setOrder(
         await getNewBuyerOrderDetails(orderId, invoiceUrl, type, sellerId)
       )
+
       setEmail(await getBuyerDecEmail(orderId))
     }
   }
@@ -66,6 +61,7 @@ export const BuyerTemplate = ({ body }) => {
       }
     })
   }
+  let orderSuffix
   let total = 0
   let placedDate = null
   let subTotal = null
@@ -83,13 +79,7 @@ export const BuyerTemplate = ({ body }) => {
         }}
       >
         <div>
-          <img
-            className={styles.logo}
-            href="/"
-            src={
-              order.logo
-            }
-          />
+          <img className={styles.logo} href="/" src={order.logo} />
         </div>
         <button
           id="printPageButton"
@@ -110,10 +100,19 @@ export const BuyerTemplate = ({ body }) => {
           .map((data, index) => {
             const isLast = vbaseKey.length === index + 1
             const newOrder = order.vbase[data]
+            orderSuffix = newOrder
+            let shippingCost = 0
+
             //Taking out Discount
             newOrder?.totals.map((totals, index) => {
               if (totals.id === 'Discounts')
                 return (discount = totals.value + (index === 2 ? discount : 0))
+            })
+
+            //Taking out Shipping
+            newOrder?.totals.map((totals, index) => {
+              if (totals.id === 'Shipping')
+                return (shippingCost = shippingCost + totals.value / 100)
             })
 
             let newDisount = discount.toString()
@@ -162,10 +161,10 @@ export const BuyerTemplate = ({ body }) => {
                       >{`Order ${order.vbase.orderId}-${data}`}</b> */}
                     </div>
                     <div>
-                        <p>{`${newOrder?.sellers?.map(
-                          (seller) => seller.name
-                        )}`}</p>
-                      </div>
+                      <p>{`${newOrder?.sellers?.map(
+                        (seller) => seller.name
+                      )}`}</p>
+                    </div>
                     <div>
                       <div>
                         <p>{order?.vbase?.shippingData?.address?.street}</p>
@@ -270,7 +269,8 @@ export const BuyerTemplate = ({ body }) => {
                         subTotal =
                           item?.priceDefinition?.total + (index ? subTotal : 0)
 
-                        tax = tax + ((subTotal/100) * (item.tax/100)) 
+                        // tax = tax + ((subTotal/100) * (item.tax/100))
+                        tax = tax + item.tax / 100
 
                         // total=(subTotal-discount+((order.vbase.shippingData.logisticsInfo[0].price)/10))
                         return (
@@ -280,9 +280,7 @@ export const BuyerTemplate = ({ body }) => {
                               {/* {item.refId} for reference id */}
                               {item?.description}
                             </td>
-                            <td style={{ textAlign: 'right' }}>
-                              {item.ws}
-                            </td>
+                            <td style={{ textAlign: 'right' }}>{item.id}</td>
                             <td style={{ textAlign: 'center' }}>
                               ${item.unitPrice / 100}
                             </td>
@@ -334,6 +332,15 @@ export const BuyerTemplate = ({ body }) => {
                         justifyContent: 'space-between',
                       }}
                     >
+                      <p style={{ color: '#979899' }}>Shipping Incl GST : </p>
+                      <p style={{ color: '#979899' }}>{`$${shippingCost}`}</p>
+                    </div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                      }}
+                    >
                       {/* <p style={{ color: '#979899' }}>Shipping</p>
                       <p style={{ color: '#979899' }}>
                         {`${(
@@ -349,7 +356,7 @@ export const BuyerTemplate = ({ body }) => {
                       }}
                     >
                       <p>Total : </p>
-                      <p>{`$${(subTotal / 100) + tax}`}</p>
+                      <p>{`$${subTotal / 100 + tax + shippingCost}`}</p>
                     </div>
                   </div>
                 </div>
@@ -370,15 +377,24 @@ export const BuyerTemplate = ({ body }) => {
         >
           <div className={styles.flex}>
             <b>Deposit Payment</b>
-            <p className={styles.leftmargin}>{`-`}</p>
+            {/* <p className={styles.leftmargin}>{`-`}</p> */}
+            <p className={styles.leftmargin}>
+              {'$' + orderSuffix?.preorderInfo?.depositPayment ?? '-'}
+            </p>
           </div>
           <div className={styles.flex}>
             <b>Balance Payment</b>
-            <p className={styles.leftmargin}>{`$${(subTotal / 100) + tax}`}</p>
+            {/* <p className={styles.leftmargin}>{`$${(subTotal / 100) + tax}`}</p> */}
+            <p className={styles.leftmargin}>
+              {'$' + orderSuffix?.preorderInfo?.balancePayment}
+            </p>
           </div>
           <div className={styles.flex}>
             <b>Balance Due</b>
-            <p className={styles.leftmargin}>{`$0.00`}</p>
+            {/* <p className={styles.leftmargin}>{`$0.00`}</p> */}
+            <p className={styles.leftmargin}>
+              {'$' + orderSuffix?.preorderInfo?.balanceDue}
+            </p>
           </div>
         </div>
       </div>

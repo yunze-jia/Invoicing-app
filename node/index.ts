@@ -10,7 +10,7 @@ import { LRUCache, Service, method } from '@vtex/api'
 import { Clients } from './clients'
 import { getBuyerEmail, getBuyerInvoiceDetails } from './middlewares/buyer'
 import { getOrderDetails } from './middlewares/getOrder'
-import { getUser, orderHooks } from './middlewares/orderHooks'
+import { orderHooks } from './middlewares/orderHooks'
 import { notify, ordersWebhook } from './middlewares/ordersWebhook'
 import { sellerInvoiceInfo } from './middlewares/seller'
 
@@ -99,11 +99,8 @@ export default new Service({
     buyerEncrptEnvoice: method({
       GET: [getBuyerEmail],
     }),
-    getusers: method({
-      POST: [getUser],
-    }),
     notifyBuyer: method({
       POST: [notify],
-    })
+    }),
   },
 })
