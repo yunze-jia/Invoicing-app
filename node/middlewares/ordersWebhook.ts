@@ -129,7 +129,7 @@ export async function ordersWebhook(ctx: any) {
       payload.OrderId,
       orderDetails?.clientProfileData?.email,
       account,
-      invoiceNumber.Id,
+      orderDetails.invoiceNumber,
       customFields,
       workspace,
       ctx

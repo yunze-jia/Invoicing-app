@@ -106,12 +106,44 @@ export async function findEachItemPreOrder(
           : !product.isProductPreorder
         break
       }
-      if (!value) break
     }
+    if (!value) break
   }
   console.log(
     'isEachItemPreOrder - ' + isEachItemPreOrder + ' result - ',
     value
   )
   return value
+}
+
+export async function filterRecentlyInvoicedItem(
+  invoicedItems: any[],
+  savedItems: any,
+  groupId: string
+) {
+  let itemsToInvoice: any = []
+  let invoiceNumber = ''
+  for (let packages of invoicedItems) {
+    console.log('Each Package of Invoiced Item - ', { packages })
+    invoiceNumber = packages.invoiceNumber
+    if (savedItems[groupId] && !savedItems[groupId][invoiceNumber]) {
+      itemsToInvoice = packages
+      break
+    } else if (!savedItems[groupId]) {
+      itemsToInvoice = packages
+      break
+    }
+  }
+  return itemsToInvoice
+}
+
+export async function checkIfAllItemsAreInvoiced(
+  packages: any[],
+  totalItems: number
+) {
+  let noItemsInvoiced = 0
+  packages.forEach((res: any) => {
+    noItemsInvoiced += res.items.length
+  })
+  return totalItems === noItemsInvoiced
 }

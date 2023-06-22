@@ -100,7 +100,7 @@ export const BuyerTemplate = ({ body }) => {
           .map((data, index) => {
             const isLast = vbaseKey.length === index + 1
             const newOrder = order.vbase[data]
-            orderSuffix = newOrder
+            orderSuffix = newOrder[invoiceUrl]
             let shippingCost = 0
 
             //Taking out Discount
@@ -110,10 +110,12 @@ export const BuyerTemplate = ({ body }) => {
             })
 
             //Taking out Shipping
-            newOrder?.totals.map((totals, index) => {
-              if (totals.id === 'Shipping')
-                return (shippingCost = shippingCost + totals.value / 100)
-            })
+            if (newOrder.allItemInvoiced) {
+              newOrder?.totals.map((totals, index) => {
+                if (totals.id === 'Shipping')
+                  return (shippingCost = shippingCost + totals.value / 100)
+              })
+            }
 
             let newDisount = discount.toString()
             discount = newDisount.replace('-', '')
@@ -226,7 +228,7 @@ export const BuyerTemplate = ({ body }) => {
                         </div>
                         <div>
                           {/* <p>{`${order?.invoiceNumber}`}</p> */}
-                          <p>{`${newOrder?.invoiceNumber}`}</p>
+                          <p>{`${orderSuffix?.invoiceNumber}`}</p>
                         </div>
                       </div>
                       <div className={styles.fontOuter}>
@@ -264,7 +266,7 @@ export const BuyerTemplate = ({ body }) => {
                       </tr>
                     </thead>
                     <tbody className={styles.aligntablecenter}>
-                      {newOrder?.items.map((item, index) => {
+                      {orderSuffix?.items.map((item, index) => {
                         // calculating subTotal
                         subTotal =
                           item?.priceDefinition?.total + (index ? subTotal : 0)
@@ -324,7 +326,7 @@ export const BuyerTemplate = ({ body }) => {
                       }}
                     >
                       <p style={{ color: '#979899' }}>Tax : </p>
-                      <p style={{ color: '#979899' }}>{`$${tax}`}</p>
+                      <p style={{ color: '#979899' }}>{`$${tax.toFixed(2)}`}</p>
                     </div>
                     <div
                       style={{
@@ -379,21 +381,22 @@ export const BuyerTemplate = ({ body }) => {
             <b>Deposit Payment</b>
             {/* <p className={styles.leftmargin}>{`-`}</p> */}
             <p className={styles.leftmargin}>
-              {'$' + orderSuffix?.preorderInfo?.depositPayment ?? '-'}
+              {'$' + orderSuffix?.preorderInfo?.depositPayment.toFixed(2) ??
+                '-'}
             </p>
           </div>
           <div className={styles.flex}>
             <b>Balance Payment</b>
             {/* <p className={styles.leftmargin}>{`$${(subTotal / 100) + tax}`}</p> */}
             <p className={styles.leftmargin}>
-              {'$' + orderSuffix?.preorderInfo?.balancePayment}
+              {'$' + orderSuffix?.preorderInfo?.balancePayment.toFixed(2)}
             </p>
           </div>
           <div className={styles.flex}>
             <b>Balance Due</b>
             {/* <p className={styles.leftmargin}>{`$0.00`}</p> */}
             <p className={styles.leftmargin}>
-              {'$' + orderSuffix?.preorderInfo?.balanceDue}
+              {'$' + orderSuffix?.preorderInfo?.balanceDue.toFixed(2)}
             </p>
           </div>
         </div>

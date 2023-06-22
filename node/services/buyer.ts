@@ -1,5 +1,7 @@
 import {
+  checkIfAllItemsAreInvoiced,
   extractPreOrderInfo,
+  filterRecentlyInvoicedItem,
   findEachItemPreOrder,
 } from '../middlewares/preorder'
 import { getSKUSpecifications } from '../middlewares/specifications'
@@ -62,18 +64,41 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
     orderDetails.totals.filter((res: any) => res.id === 'Shipping')[0].value /
     100
 
+  let allItems
+
+  const invoiceDetails: any = !vbaseOrderDetails
+    ? orderDetails.packageAttachment.packages[0]
+    : await filterRecentlyInvoicedItem(
+        orderDetails.packageAttachment.packages,
+        vbaseOrderDetails,
+        newOrderId[1]
+      )
+
+  console.log('Invoiced item Details - ', invoiceDetails)
+
   if (vbaseOrderDetails != null) {
     let changeobj = []
-    for (const item of orderDetails.items) {
-      if (isPreorder) {
-        const { depositPayment, balancePayment, balanceDue } =
-          await extractPreOrderInfo(preOrderDetails, item)
-        preorderPayment.depositPayment =
-          preorderPayment.depositPayment + depositPayment
-        preorderPayment.balancePayment =
-          preorderPayment.balancePayment + balancePayment
-        preorderPayment.balanceDue = preorderPayment.balanceDue + balanceDue
-      }
+    for (const item of invoiceDetails.items) {
+      // if (!isPreorder) {
+      allItems = orderDetails.items[item.itemIndex]
+      item.tax = allItems.tax
+      item.id = allItems.id
+      item.name = allItems.name
+      item.priceDefinition = allItems.priceDefinition
+      item.unitPrice = allItems.sellingPrice
+      item.orderCommission = allItems.commission
+      item.refId = allItems.refId
+      item.sellingPrice = allItems.sellingPrice
+      // }
+      // if (isPreorder) {
+      const { depositPayment, balancePayment, balanceDue } =
+        await extractPreOrderInfo(preOrderDetails, item)
+      preorderPayment.depositPayment =
+        preorderPayment.depositPayment + depositPayment
+      preorderPayment.balancePayment =
+        preorderPayment.balancePayment + balancePayment
+      preorderPayment.balanceDue = preorderPayment.balanceDue + balanceDue
+      // }
 
       changeobj.push({
         id: item.id,
@@ -89,24 +114,48 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       })
     }
 
+    const allItemInvoiced = await checkIfAllItemsAreInvoiced(
+      orderDetails.packageAttachment.packages,
+      orderDetails.items.length
+    )
+    console.log('All Items are invoiced', allItemInvoiced)
     if (preorderPayment.depositPayment !== 0) {
-      preorderPayment.depositPayment =
-        preorderPayment.depositPayment + priceWithShipment
+      preorderPayment.depositPayment = allItemInvoiced
+        ? preorderPayment.depositPayment + priceWithShipment
+        : preorderPayment.depositPayment
     } else {
-      preorderPayment.balancePayment =
-        preorderPayment.balancePayment + priceWithShipment
+      preorderPayment.balancePayment = allItemInvoiced
+        ? preorderPayment.balancePayment + priceWithShipment
+        : preorderPayment.balancePayment
     }
 
-    vbaseOrderDetails[newOrderId[1]] = { items: changeobj }
-    vbaseOrderDetails[newOrderId[1]].totals = orderDetails.totals
-    vbaseOrderDetails[newOrderId[1]].grandTotal = orderDetails.value
-    vbaseOrderDetails[newOrderId[1]].sellers = orderDetails.sellers
-    vbaseOrderDetails[newOrderId[1]].invoiceNumber =
-      orderDetails?.packageAttachment?.packages[0]?.invoiceNumber
-    vbaseOrderDetails[newOrderId[1]].preorderInfo = preorderPayment
-    vbaseOrderDetails['shippingData'] = shippingData
-    vbaseOrderDetails['orderId'] = orderDetails.orderId.split('-')[0]
-    vbaseOrderDetails['newInvoiceData'] = invoiceData
+    vbaseOrderDetails[newOrderId[1]] = !vbaseOrderDetails[newOrderId[1]]
+      ? {}
+      : vbaseOrderDetails[newOrderId[1]]
+    vbaseOrderDetails[newOrderId[1]][invoiceDetails.invoiceNumber] = {
+      items: changeobj,
+      invoiceNumber: invoiceDetails.invoiceNumber,
+      preorderInfo: preorderPayment,
+    }
+    console.log(
+      'Vbase details after saving the invoie details',
+      vbaseOrderDetails
+    )
+    console.log(
+      'vbase if total are there - ',
+      vbaseOrderDetails[newOrderId[1]]?.totals
+    )
+
+    if (!vbaseOrderDetails[newOrderId[1]]?.totals) {
+      vbaseOrderDetails[newOrderId[1]].totals = orderDetails.totals
+      vbaseOrderDetails[newOrderId[1]].grandTotal = orderDetails.value
+      vbaseOrderDetails[newOrderId[1]].sellers = orderDetails.sellers
+      vbaseOrderDetails['shippingData'] = shippingData
+      vbaseOrderDetails['orderId'] = orderDetails.orderId.split('-')[0]
+      vbaseOrderDetails['newInvoiceData'] = invoiceData
+    }
+    vbaseOrderDetails[newOrderId[1]].allItemInvoiced = allItemInvoiced
+    console.log('Vbase details after saving the all details', vbaseOrderDetails)
 
     saveToVbaseResponse = await saveVbaseData(
       newOrderId[0],
@@ -116,16 +165,24 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
   } else {
     let saveObj: any = {}
     let items = []
-    for (const item of orderDetails.items) {
-      if (isPreorder) {
-        const { depositPayment, balancePayment, balanceDue } =
-          await extractPreOrderInfo(preOrderDetails, item)
-        preorderPayment.depositPayment =
-          preorderPayment.depositPayment + depositPayment
-        preorderPayment.balancePayment =
-          preorderPayment.balancePayment + balancePayment
-        preorderPayment.balanceDue = preorderPayment.balanceDue + balanceDue
-      }
+    for (const item of invoiceDetails.items) {
+      allItems = orderDetails.items[item.itemIndex]
+      item.tax = allItems.tax
+      item.id = allItems.id
+      item.name = allItems.name
+      item.priceDefinition = allItems.priceDefinition
+      item.unitPrice = allItems.sellingPrice
+      item.orderCommission = allItems.commission
+      item.refId = allItems.refId
+      item.sellingPrice = allItems.sellingPrice
+
+      const { depositPayment, balancePayment, balanceDue } =
+        await extractPreOrderInfo(preOrderDetails, item)
+      preorderPayment.depositPayment =
+        preorderPayment.depositPayment + depositPayment
+      preorderPayment.balancePayment =
+        preorderPayment.balancePayment + balancePayment
+      preorderPayment.balanceDue = preorderPayment.balanceDue + balanceDue
       items.push({
         id: item.id,
         name: item.name,
@@ -139,23 +196,31 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
         description: await getSKUSpecifications(item.id, account, authToken),
       })
     }
-
+    const allItemInvoiced = await checkIfAllItemsAreInvoiced(
+      orderDetails.packageAttachment.packages,
+      orderDetails.items.length
+    )
     console.log({ items })
     if (preorderPayment.depositPayment !== 0) {
-      preorderPayment.depositPayment =
-        preorderPayment.depositPayment + priceWithShipment
+      preorderPayment.depositPayment = allItemInvoiced
+        ? preorderPayment.depositPayment + priceWithShipment
+        : preorderPayment.depositPayment
     } else {
       preorderPayment.balancePayment =
         preorderPayment.balancePayment + priceWithShipment
     }
+    saveObj[newOrderId[1]] = {
+      [invoiceDetails.invoiceNumber]: {
+        items: items,
+        invoiceNumber: invoiceDetails.invoiceNumber,
+        preorderInfo: preorderPayment,
+      },
+    }
 
-    saveObj[newOrderId[1]] = { items: items }
-    saveObj[newOrderId[1]].invoiceNumber =
-      orderDetails?.packageAttachment?.packages[0]?.invoiceNumber
     saveObj[newOrderId[1]].totals = orderDetails.totals
     saveObj[newOrderId[1]].grandTotal = orderDetails.value
     saveObj[newOrderId[1]].sellers = orderDetails.sellers
-    saveObj[newOrderId[1]].preorderInfo = preorderPayment
+    saveObj[newOrderId[1]].allItemInvoiced = allItemInvoiced
     saveObj['shippingData'] = shippingData
     saveObj['newInvoiceData'] = invoiceData
     saveObj['orderId'] = orderDetails.orderId.split('-')[0]
@@ -188,6 +253,8 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       )
     }
   ).length
+
+  orderDetails.invoiceNumber = invoiceDetails.invoiceNumber
   return orderDetails
 }
 
