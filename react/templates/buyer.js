@@ -64,7 +64,7 @@ export const BuyerTemplate = ({ body }) => {
   let orderSuffix
   let total = 0
   let placedDate = null
-  let subTotal = null
+  let subTotal = 0
   let tax = 0
   let issueDate = null
   let discount = null
@@ -256,9 +256,9 @@ export const BuyerTemplate = ({ body }) => {
                   <table>
                     <thead>
                       <tr>
-                        <th style={{ textAlign: 'left' }}>SKU</th>
-                        <th style={{ textAlign: 'left' }}>Description</th>
-                        <th style={{ textAlign: 'left' }}>WS</th>
+                        <th style={{ textAlign: 'center' }}>SKU</th>
+                        <th style={{ textAlign: 'center' }}>Description</th>
+                        <th style={{ textAlign: 'center' }}>WS</th>
                         <th style={{ textAlign: 'center' }}>Unit price</th>
                         <th style={{ textAlign: 'center' }}>Quantity</th>
                         <th style={{ textAlign: 'center' }}>Tax</th>
@@ -269,7 +269,7 @@ export const BuyerTemplate = ({ body }) => {
                       {orderSuffix?.items.map((item, index) => {
                         // calculating subTotal
                         subTotal =
-                          item?.priceDefinition?.total + (index ? subTotal : 0)
+                          subTotal + (item.unitPrice / 100) * item.quantity
 
                         // tax = tax + ((subTotal/100) * (item.tax/100))
                         tax = tax + item.tax / 100
@@ -277,23 +277,25 @@ export const BuyerTemplate = ({ body }) => {
                         // total=(subTotal-discount+((order.vbase.shippingData.logisticsInfo[0].price)/10))
                         return (
                           <tr>
-                            <td style={{ textAlign: 'left' }}>{item?.id}</td>
+                            <td style={{ textAlign: 'center' }}>{item?.id}</td>
                             <td style={{ textAlign: 'center' }}>
                               {/* {item.refId} for reference id */}
-                              {item?.description}
+                              {item?.description ?? '-'}
                             </td>
-                            <td style={{ textAlign: 'right' }}>{item.id}</td>
+                            <td style={{ textAlign: 'center' }}>
+                              {item?.ws ?? '-'}
+                            </td>
                             <td style={{ textAlign: 'center' }}>
                               ${item.unitPrice / 100}
                             </td>
                             <td style={{ textAlign: 'center' }}>
                               {item.quantity}
                             </td>
-                            <td style={{ textAlign: 'right' }}>
+                            <td style={{ textAlign: 'center' }}>
                               ${item.tax / 100}
                             </td>
                             <td style={{ textAlign: 'right' }}>
-                              ${item.priceDefinition.total / 100}
+                              ${(item.unitPrice / 100) * item.quantity}
                             </td>
                           </tr>
                         )
@@ -317,7 +319,7 @@ export const BuyerTemplate = ({ body }) => {
                       }}
                     >
                       <p style={{ color: '#979899' }}>Subtotal</p>
-                      <p style={{ color: '#979899' }}>{`$${subTotal / 100}`}</p>
+                      <p style={{ color: '#979899' }}>{`$${subTotal}`}</p>
                     </div>
                     <div
                       style={{
@@ -335,7 +337,9 @@ export const BuyerTemplate = ({ body }) => {
                       }}
                     >
                       <p style={{ color: '#979899' }}>Shipping Incl GST : </p>
-                      <p style={{ color: '#979899' }}>{`$${shippingCost}`}</p>
+                      <p
+                        style={{ color: '#979899' }}
+                      >{`$${orderSuffix?.shippingCharge}`}</p>
                     </div>
                     <div
                       style={{
@@ -358,7 +362,9 @@ export const BuyerTemplate = ({ body }) => {
                       }}
                     >
                       <p>Total : </p>
-                      <p>{`$${subTotal / 100 + tax + shippingCost}`}</p>
+                      <p>{`$${
+                        subTotal + tax + orderSuffix?.shippingCharge
+                      }`}</p>
                     </div>
                   </div>
                 </div>

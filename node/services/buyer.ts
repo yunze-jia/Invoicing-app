@@ -65,7 +65,7 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
     100
 
   let allItems
-
+  let shippingCost
   const invoiceDetails: any = !vbaseOrderDetails
     ? orderDetails.packageAttachment.packages[0]
     : await filterRecentlyInvoicedItem(
@@ -75,6 +75,11 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       )
 
   console.log('Invoiced item Details - ', invoiceDetails)
+
+  //calculating shipping cost for the order
+  orderDetails.totals.forEach((totals: any) => {
+    if (totals.id === 'Shipping') shippingCost = totals.value / 100
+  })
 
   if (vbaseOrderDetails != null) {
     let changeobj = []
@@ -116,7 +121,7 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
 
     const allItemInvoiced = await checkIfAllItemsAreInvoiced(
       orderDetails.packageAttachment.packages,
-      orderDetails.items.length
+      orderDetails.items
     )
     console.log('All Items are invoiced', allItemInvoiced)
     if (preorderPayment.depositPayment !== 0) {
@@ -136,6 +141,7 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       items: changeobj,
       invoiceNumber: invoiceDetails.invoiceNumber,
       preorderInfo: preorderPayment,
+      shippingCharge: allItemInvoiced ? shippingCost : 0,
     }
     console.log(
       'Vbase details after saving the invoie details',
@@ -198,7 +204,7 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
     }
     const allItemInvoiced = await checkIfAllItemsAreInvoiced(
       orderDetails.packageAttachment.packages,
-      orderDetails.items.length
+      orderDetails.items
     )
     console.log({ items })
     if (preorderPayment.depositPayment !== 0) {
@@ -206,14 +212,16 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
         ? preorderPayment.depositPayment + priceWithShipment
         : preorderPayment.depositPayment
     } else {
-      preorderPayment.balancePayment =
-        preorderPayment.balancePayment + priceWithShipment
+      preorderPayment.balancePayment = allItemInvoiced
+        ? preorderPayment.balancePayment + priceWithShipment
+        : preorderPayment.balancePayment
     }
     saveObj[newOrderId[1]] = {
       [invoiceDetails.invoiceNumber]: {
         items: items,
         invoiceNumber: invoiceDetails.invoiceNumber,
         preorderInfo: preorderPayment,
+        shippingCharge: allItemInvoiced ? shippingCost : 0,
       },
     }
 

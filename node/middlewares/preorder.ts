@@ -44,7 +44,7 @@ export async function extractPreOrderInfo(preOrder: any, item: any) {
     balancePayment: 0,
     balanceDue: 0,
   }
-  const { percent } = preOrder
+
   console.log('ITEM - SKU INFO - ', { item })
   if (
     preOrder?.paymentId &&
@@ -54,8 +54,13 @@ export async function extractPreOrderInfo(preOrder: any, item: any) {
     console.log('PREORDER EXISTS', { preOrder })
 
     for (const preorderitem of preOrder.products) {
-      const { remainingCharge, quantity, fullPrice, isProductPreorder } =
-        preorderitem
+      const {
+        remainingCharge,
+        quantity,
+        fullPrice,
+        isProductPreorder,
+        percent,
+      } = preorderitem
       console.log({ remainingCharge, quantity, fullPrice })
       const totalWithoutShippingCharge =
         (item.sellingPrice / 100) * item.quantity + item.tax / 100
@@ -139,11 +144,20 @@ export async function filterRecentlyInvoicedItem(
 
 export async function checkIfAllItemsAreInvoiced(
   packages: any[],
-  totalItems: number
+  items: any[]
 ) {
-  let noItemsInvoiced = 0
-  packages.forEach((res: any) => {
-    noItemsInvoiced += res.items.length
-  })
+  const totalItems = items.reduce((total, item) => total + item.quantity, 0)
+  const noItemsInvoiced = packages.reduce(
+    (total, packages) =>
+      total +
+      packages.items.reduce(
+        (itotal: number, item: any) => itotal + item.quantity,
+        0
+      ),
+    0
+  )
+  console.log(
+    'totalItems - ' + totalItems + ' noItemsInvoiced - ' + noItemsInvoiced
+  )
   return totalItems === noItemsInvoiced
 }
