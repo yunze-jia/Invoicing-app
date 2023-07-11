@@ -11,7 +11,7 @@ import { Clients } from './clients'
 import { getBuyerEmail, getBuyerInvoiceDetails } from './middlewares/buyer'
 import { getOrderDetails } from './middlewares/getOrder'
 import { orderHooks } from './middlewares/orderHooks'
-import { notify, ordersWebhook } from './middlewares/ordersWebhook'
+import { ordersWebhook, trigger } from './middlewares/ordersWebhook'
 import { sellerInvoiceInfo } from './middlewares/seller'
 
 const TIMEOUT_MS = 800
@@ -99,8 +99,8 @@ export default new Service({
     buyerEncrptEnvoice: method({
       GET: [getBuyerEmail],
     }),
-    notifyBuyer: method({
-      POST: [notify],
-    }),
+  },
+  events: {
+    trigger,
   },
 })

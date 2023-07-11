@@ -33,10 +33,12 @@
     "buyerEncrptEnvoice": {
       "path": "/_v/orders/buyerEncrptEmails/:orderId",
       "public": true
-    },
-    "notifyBuyer": {
-      "path": "/_v/notify/buyer",
-      "public": true
+    }
+  },
+  "events": {
+    "trigger": {
+      "sender": "vtex.orders-broadcast",
+      "topics": ["invoice"]
     }
   }
 }

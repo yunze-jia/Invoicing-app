@@ -14,13 +14,10 @@ export const getOrderDetails = async (orderId, invoiceUrl, type, sellerId) => {
   let orderDetails = await axios
     .request(options)
     .then(function (response) {
-      console.log(response.data)
       return response.data
     })
-    .catch(function (error) {
-      console.log(error)
-    })
-    debugger
+    .catch(function (error) {})
+  debugger
   // let invoiceNumber = await generateInvoiceNumber(orderDetails.orderId);
   orderDetails.invoiceNumber = invoiceUrl
   //  = orderDetails.items
@@ -137,7 +134,6 @@ export const getBuyerDecEmail = async (orderId) => {
   }
 
   const decrEmail = await axios.request(options)
-  console.debug(decrEmail)
   if (decrEmail) {
     return decrEmail.data
   } else {

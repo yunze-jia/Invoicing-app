@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-key */
 import React, { useEffect, useState } from 'react'
 import { getOrderDetails, getSellerInfo } from '../services/order'
 import { getLogo } from './buyer'
@@ -21,13 +22,11 @@ export const SellerTemplate = ({ body }) => {
       setSellerInfo(await getSellerInfo(sellerIds))
     }
   }
-  console.log(sellerInfo)
   useEffect(() => {
     setOrderDetails()
     setInterval(getLogo(setLogo, logo), 2000)
   }, [])
 
-  console.log(order)
   const downloadPdf = () => {
     try {
       // Print for Safari browser
@@ -65,8 +64,11 @@ export const SellerTemplate = ({ body }) => {
     let calculatedDiscount = order?.totals?.filter((totals, index) => {
       if (totals.id === 'Discounts')
         return (discount = totals.value + (index === 2 ? discount : 0)) / 100
-    });
-    return typeof calculatedDiscount === "undefined" || typeof calculatedDiscount === "object" ? 0 : calculatedDiscount[0].value / 100
+    })
+    return typeof calculatedDiscount === 'undefined' ||
+      typeof calculatedDiscount === 'object'
+      ? 0
+      : calculatedDiscount[0].value / 100
   }
 
   const calculateShippingCharge = (order) => {
@@ -92,7 +94,7 @@ export const SellerTemplate = ({ body }) => {
               // logo.length != 0
               //   ? logo[0]
               //   :
-                 'blob:https://docs.google.com/d70f6cca-d21c-4984-b2d5-823131b1eb0c'
+              'blob:https://docs.google.com/d70f6cca-d21c-4984-b2d5-823131b1eb0c'
             }
           />
         </div>
@@ -255,13 +257,15 @@ export const SellerTemplate = ({ body }) => {
                       }`} */}
             </p>
           </div>
-          <div  style={{ display: 'flex'  , justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <p style={{ color: '#979899' }}>Total Order comission </p>
             <p style={{ color: '#979899' }}>
               {/* {`  ${order?.items?.reduce((total,value) => {return (total + value.commission/100).toFixed(2)},0)}`} */}
-              {`  ${((order?.items?.reduce((total,value)=>{
+              {`  ${(
+                order?.items?.reduce((total, value) => {
                   return total + value.commission
-              },0))/100).toFixed(2)}`}
+                }, 0) / 100
+              ).toFixed(2)}`}
             </p>
           </div>
         </div>
@@ -283,7 +287,7 @@ export const SellerTemplate = ({ body }) => {
           }}
         >
           <p>Grand Total</p>
-           <p>{`${grandTotals}`}</p>
+          <p>{`${grandTotals}`}</p>
         </div>
       </div>
     </div>

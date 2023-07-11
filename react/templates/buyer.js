@@ -9,14 +9,11 @@ export const getLogo = (setLogo) => {
       'vtex-store-components-3-x-logoImage vtex-render-runtime-8-x-lazyload lazyloaded'
     )
   )
-  // const finalLogo=tempLogo?.map((data)=>data.src)
-  // console.log(finalLogo);
   setLogo(tempLogo)
 }
 
 export const BuyerTemplate = ({ body }) => {
   const [test, setTest] = useState(false)
-  console.log(body)
   const orderId = body.params ? body.params.order_id : null
   const groupId = orderId.split('-')[1]
   let invoiceUrl = body.params ? body.params.invoice_url : null
@@ -39,10 +36,6 @@ export const BuyerTemplate = ({ body }) => {
     }
   }
 
-  console.log(email)
-
-  console.log('NewLogo=========>', logo)
-
   const downloadPdf = () => {
     try {
       // Print for Safari browser
@@ -52,7 +45,6 @@ export const BuyerTemplate = ({ body }) => {
     }
   }
 
-  console.log(order)
   let vbaseKey = []
   if (order?.vbase) {
     vbaseKey = Object.keys(order.vbase).filter((i) => {
@@ -283,7 +275,7 @@ export const BuyerTemplate = ({ body }) => {
                               {item?.description ?? '-'}
                             </td>
                             <td style={{ textAlign: 'center' }}>
-                              {item?.ws ?? '-'}
+                              {item?.wholeSalePrice ?? '-'}
                             </td>
                             <td style={{ textAlign: 'center' }}>
                               ${item.unitPrice / 100}

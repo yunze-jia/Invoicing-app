@@ -4,7 +4,10 @@ import {
   filterRecentlyInvoicedItem,
   findEachItemPreOrder,
 } from '../middlewares/preorder'
-import { getSKUSpecifications } from '../middlewares/specifications'
+import {
+  getProductSpecifications,
+  getSKUSpecifications,
+} from '../middlewares/specifications'
 import { getVbaseData, saveVbaseData } from '../middlewares/vbase'
 
 //
@@ -94,6 +97,7 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       item.orderCommission = allItems.commission
       item.refId = allItems.refId
       item.sellingPrice = allItems.sellingPrice
+      item.productId = allItems.productId
       // }
       // if (isPreorder) {
       const { depositPayment, balancePayment, balanceDue } =
@@ -116,6 +120,11 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
         refId: item.refId,
         tax: item.tax,
         description: await getSKUSpecifications(item.id, account, authToken),
+        wholeSalePrice: await getProductSpecifications(
+          item.productId,
+          account,
+          authToken
+        ),
       })
     }
 
@@ -181,6 +190,7 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       item.orderCommission = allItems.commission
       item.refId = allItems.refId
       item.sellingPrice = allItems.sellingPrice
+      item.productId = allItems.productId
 
       const { depositPayment, balancePayment, balanceDue } =
         await extractPreOrderInfo(preOrderDetails, item)
@@ -200,6 +210,11 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
         refId: item.refId,
         tax: item.tax,
         description: await getSKUSpecifications(item.id, account, authToken),
+        wholeSalePrice: await getProductSpecifications(
+          item.productId,
+          account,
+          authToken
+        ),
       })
     }
     const allItemInvoiced = await checkIfAllItemsAreInvoiced(
@@ -301,7 +316,7 @@ export async function notifyBuyer(
       cc: customFields.marketplace_email,
       email: useremail,
       invoiceUrl: `https://${workspace}--${account}.myvtex.com/invoice/buyer/${orderId}/${invoiceNo}`,
-      message: 'This is a test',
+      message: '',
     },
   }
   const emailRes = await email.notify(account, payload)

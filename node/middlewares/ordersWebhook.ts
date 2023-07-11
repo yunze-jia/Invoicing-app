@@ -7,68 +7,12 @@ import {
   getSellerEmailById,
   notifySeller,
 } from '../services/seller'
-import { getOrderDetailsWithFilter } from './getOrder'
 
-function getStartAndEndDate() {
-  const date = new Date()
-  let startDateTime
-  let endDateTime
-  let startdays = 7
-  let start = new Date(date.getTime() - startdays * 24 * 60 * 60 * 1000)
-  startDateTime =
-    start.getFullYear() +
-    '-' +
-    (start.getMonth() + 1) +
-    '-' +
-    start.getDate() +
-    'T00:00:00.000Z'
-  let enddays = 1
-  let end = new Date(date.getTime() + enddays * 24 * 60 * 60 * 1000)
-  endDateTime =
-    end.getFullYear() +
-    '-' +
-    (end.getMonth() + 1) +
-    '-' +
-    end.getDate() +
-    'T00:00:00.000Z'
-  return { startDateTime, endDateTime }
-}
-
-export async function getOrdersList(
-  groupId: any,
-  authToken: any,
-  customFields: any,
-  account: any,
-  ctx: any
-) {
-  const {
-    vtex: { logger },
-  } = ctx
-
-  logger.info({
-    message: 'ORDER LIST INCOMING PARAMS',
-    data: { authToken, customFields, account },
-  })
-  const dates = getStartAndEndDate()
-  let count = 0
-  const searchUrlParams = `?f_creationDate=creationDate:[${dates.startDateTime} TO ${dates.endDateTime}]&f_hasInputInvoice=false`
-  const list: any = await getOrderDetailsWithFilter(
-    searchUrlParams,
-    ctx.vtex.authToken,
-    account,
-    customFields
-  )
-  if (list.isError) {
-    return list
-  }
-
-  list.payload.list.map((res: any) => {
-    if (res.orderId.split('-')[0] === groupId) {
-      count++
-      return
-    }
-  })
-  return { isError: false, data: count }
+export async function trigger(ctx: any, next: () => Promise<any>) {
+  const payload = await json(ctx.req)
+  console.log('Invoice triggered - ', payload)
+  ctx.status = 200
+  await next()
 }
 
 export async function ordersWebhook(ctx: any) {
@@ -152,25 +96,4 @@ export async function ordersWebhook(ctx: any) {
     console.log(e)
     return
   }
-}
-
-export async function notify(ctx: any) {
-  const body: any = await json(ctx.req)
-  const {
-    vtex: { account, authToken },
-  } = ctx
-  console.log('IN HOOK', authToken)
-  const workspace = ctx.req.headers['x-vtex-workspace']
-  const res = await notifyBuyer(
-    body.orderId,
-    body.email,
-    account,
-    body.invoiceNo,
-    body.marketplaceEmail,
-    workspace,
-    ctx
-  )
-  ctx.body = res
-  ctx.status = 200
-  return
 }
