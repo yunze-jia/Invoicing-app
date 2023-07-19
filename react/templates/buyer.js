@@ -70,16 +70,18 @@ export const BuyerTemplate = ({ body }) => {
           marginBottom: '6%',
         }}
       >
+        <div className={styles.printmargin}>
+          <button
+            id="printPageButton"
+            className={styles.printButton}
+            onClick={downloadPdf}
+          >
+            print
+          </button>
+        </div>
         <div>
           <img className={styles.logo} href="/" src={order.logo} />
         </div>
-        <button
-          id="printPageButton"
-          className={styles.printButton}
-          onClick={downloadPdf}
-        >
-          print
-        </button>
       </div>
       {order?.vbase &&
         vbaseKey
@@ -141,7 +143,7 @@ export const BuyerTemplate = ({ body }) => {
                 <div
                   style={{
                     marginBottom: '35px',
-                    width: '100%',
+                    width: '89%',
                     display: 'flex',
                     marginTop: '2%',
                     justifyContent: 'space-between',
@@ -154,11 +156,11 @@ export const BuyerTemplate = ({ body }) => {
                         className={styles.orderStyle}
                       >{`Order ${order.vbase.orderId}-${data}`}</b> */}
                     </div>
-                    <div>
+                    {/* <div>
                       <p>{`${newOrder?.sellers?.map(
                         (seller) => seller.name
                       )}`}</p>
-                    </div>
+                    </div> */}
                     <div>
                       <div>
                         <p>{order?.vbase?.shippingData?.address?.street}</p>
@@ -223,12 +225,35 @@ export const BuyerTemplate = ({ body }) => {
                           <p>{`${orderSuffix?.invoiceNumber}`}</p>
                         </div>
                       </div>
-                      <div className={styles.fontOuter}>
-                        <p>Whola Pty Ltd</p>
+                      <div>
+                        <div className={styles.invoiceinfo}>
+                          <b>Whola Pty Ltd</b>
+                        </div>
+                        <div>
+                          <p>ABN 76 632 555</p>
+                        </div>
                       </div>
-                      <div className={styles.fontOuter}>
-                        <p>ABN 76 632 555</p>
+                      <div>
+                        <div className={styles.invoiceinfo}>
+                          <b>Seller</b>
+                        </div>
+                        <div>
+                          <p>{`${newOrder?.sellers?.map(
+                            (seller) => seller.name
+                          )}`}</p>
+                        </div>
                       </div>
+
+                      {/* <div>
+                        <div className={styles.invoiceinfo}>
+                          <b>Seller</b>
+                        </div>
+                        <div>
+                          <p>{`${newOrder?.sellers?.map(
+                            (seller) => seller.name
+                          )}`}</p>
+                        </div>
+                      </div> */}
                       {/* <div>
                         <a href="#0">{`${email?.email}`}</a>
                       </div>
@@ -244,7 +269,7 @@ export const BuyerTemplate = ({ body }) => {
                     </div>
                   </div>
                 </div>
-                <div>
+                <div className={styles.tablemargin}>
                   <table>
                     <thead>
                       <tr>
@@ -271,8 +296,8 @@ export const BuyerTemplate = ({ body }) => {
                           <tr>
                             <td style={{ textAlign: 'center' }}>{item?.id}</td>
                             <td style={{ textAlign: 'center' }}>
-                              {/* {item.refId} for reference id */}
-                              {item?.description ?? '-'}
+                              {item.refId}
+                              {/* {item?.description ?? '-'} */}
                             </td>
                             <td style={{ textAlign: 'center' }}>
                               {item?.wholeSalePrice ?? '-'}
@@ -303,7 +328,10 @@ export const BuyerTemplate = ({ body }) => {
                     fontWeight: 700,
                   }}
                 >
-                  <div className={styles.totalStyle}>
+                  <div
+                    className={styles.totalStyle}
+                    style={{ minWidth: '300px' }}
+                  >
                     <div
                       style={{
                         display: 'flex',
@@ -363,7 +391,7 @@ export const BuyerTemplate = ({ body }) => {
               </div>
             )
           })}
-      <hr style={{ color: '#E3E4E6' }} />
+      {/* <hr style={{ color: '#E3E4E6' }} /> */}
       <div
         style={{
           display: 'flex',
@@ -372,10 +400,14 @@ export const BuyerTemplate = ({ body }) => {
       >
         <div
           style={{
+            minWidth: '300px',
             marginTop: '30px',
           }}
         >
-          <div className={styles.flex}>
+          <div
+            className={styles.flex}
+            style={{ justifyContent: 'space-between' }}
+          >
             <b>Deposit Payment</b>
             {/* <p className={styles.leftmargin}>{`-`}</p> */}
             <p className={styles.leftmargin}>
@@ -383,14 +415,20 @@ export const BuyerTemplate = ({ body }) => {
                 '-'}
             </p>
           </div>
-          <div className={styles.flex}>
+          <div
+            className={styles.flex}
+            style={{ justifyContent: 'space-between' }}
+          >
             <b>Balance Payment</b>
             {/* <p className={styles.leftmargin}>{`$${(subTotal / 100) + tax}`}</p> */}
             <p className={styles.leftmargin}>
               {'$' + orderSuffix?.preorderInfo?.balancePayment.toFixed(2)}
             </p>
           </div>
-          <div className={styles.flex}>
+          <div
+            className={styles.flex}
+            style={{ justifyContent: 'space-between' }}
+          >
             <b>Balance Due</b>
             {/* <p className={styles.leftmargin}>{`$0.00`}</p> */}
             <p className={styles.leftmargin}>
