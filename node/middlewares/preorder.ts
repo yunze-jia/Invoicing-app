@@ -43,6 +43,7 @@ export async function extractPreOrderInfo(preOrder: any, item: any) {
     depositPayment: 0,
     balancePayment: 0,
     balanceDue: 0,
+    isPreOrder: false,
   }
 
   console.log('ITEM - SKU INFO - ', { item })
@@ -66,6 +67,7 @@ export async function extractPreOrderInfo(preOrder: any, item: any) {
         (item.sellingPrice / 100) * item.quantity + item.tax / 100
       if (item.id === preorderitem.skuId) {
         if (isProductPreorder) {
+          preorderObj.isPreOrder = preorderitem.isProductPreorder
           preorderObj.balancePayment =
             preorderObj.balancePayment +
             totalWithoutShippingCharge -
@@ -74,6 +76,10 @@ export async function extractPreOrderInfo(preOrder: any, item: any) {
           preorderObj.depositPayment =
             preorderObj.depositPayment +
             totalWithoutShippingCharge * (percent / 100)
+
+          preorderObj.balanceDue =
+            preorderObj.balanceDue +
+            (totalWithoutShippingCharge - preorderObj.depositPayment)
         } else {
           preorderObj.balancePayment = totalWithoutShippingCharge
         }

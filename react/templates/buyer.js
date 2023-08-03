@@ -213,7 +213,7 @@ export const BuyerTemplate = ({ body }) => {
                           <b>Invoice Date</b>
                         </div>
                         <div>
-                          <p>{`${issueDate[2]} ${issueDate[1]} ${issueDate[3]} at ${issueDate[4]}`}</p>
+                          <div>{`${issueDate[2]} ${issueDate[1]} ${issueDate[3]} at ${issueDate[4]}`}</div>
                         </div>
                       </div>
                       <div>
@@ -222,7 +222,7 @@ export const BuyerTemplate = ({ body }) => {
                         </div>
                         <div>
                           {/* <p>{`${order?.invoiceNumber}`}</p> */}
-                          <p>{`${orderSuffix?.invoiceNumber}`}</p>
+                          <div>{`${orderSuffix?.invoiceNumber}`}</div>
                         </div>
                       </div>
                       <div>
@@ -230,7 +230,7 @@ export const BuyerTemplate = ({ body }) => {
                           <b>Whola Pty Ltd</b>
                         </div>
                         <div>
-                          <p>ABN 76 632 555</p>
+                          <div>ABN 76 632 555</div>
                         </div>
                       </div>
                       <div>
@@ -238,9 +238,9 @@ export const BuyerTemplate = ({ body }) => {
                           <b>Seller</b>
                         </div>
                         <div>
-                          <p>{`${newOrder?.sellers?.map(
+                          <div>{`${newOrder?.sellers?.map(
                             (seller) => seller.name
-                          )}`}</p>
+                          )}`}</div>
                         </div>
                       </div>
 
@@ -275,6 +275,7 @@ export const BuyerTemplate = ({ body }) => {
                       <tr>
                         <th style={{ textAlign: 'center' }}>SKU</th>
                         <th style={{ textAlign: 'center' }}>Description</th>
+                        <th style={{ textAlign: 'center' }}>Preorder</th>
                         <th style={{ textAlign: 'center' }}>WS</th>
                         <th style={{ textAlign: 'center' }}>Unit price</th>
                         <th style={{ textAlign: 'center' }}>Quantity</th>
@@ -297,6 +298,10 @@ export const BuyerTemplate = ({ body }) => {
                             <td style={{ textAlign: 'center' }}>{item?.id}</td>
                             <td style={{ textAlign: 'center' }}>
                               {item.refId}
+                              {/* {item?.description ?? '-'} */}
+                            </td>
+                            <td style={{ textAlign: 'center' }}>
+                              {item.isPreOrder ? 'YES' : 'NO' ?? ''}
                               {/* {item?.description ?? '-'} */}
                             </td>
                             <td style={{ textAlign: 'center' }}>
@@ -333,33 +338,40 @@ export const BuyerTemplate = ({ body }) => {
                     style={{ minWidth: '300px' }}
                   >
                     <div
+                      className={styles.spacing}
                       style={{
                         display: 'flex',
                         justifyContent: 'space-between',
                       }}
                     >
-                      <p style={{ color: '#979899' }}>Subtotal</p>
-                      <p style={{ color: '#979899' }}>{`$${subTotal}`}</p>
+                      <div style={{ color: '#979899' }}>Subtotal</div>
+                      <div style={{ color: '#979899' }}>{`$${subTotal}`}</div>
                     </div>
                     <div
+                      className={styles.spacing}
                       style={{
                         display: 'flex',
                         justifyContent: 'space-between',
                       }}
                     >
-                      <p style={{ color: '#979899' }}>Tax : </p>
-                      <p style={{ color: '#979899' }}>{`$${tax.toFixed(2)}`}</p>
+                      <div style={{ color: '#979899' }}>Tax : </div>
+                      <div style={{ color: '#979899' }}>{`$${tax.toFixed(
+                        2
+                      )}`}</div>
                     </div>
                     <div
+                      className={styles.spacing}
                       style={{
                         display: 'flex',
                         justifyContent: 'space-between',
                       }}
                     >
-                      <p style={{ color: '#979899' }}>Shipping Incl GST : </p>
-                      <p
+                      <div style={{ color: '#979899' }}>
+                        Shipping Incl GST :{' '}
+                      </div>
+                      <div
                         style={{ color: '#979899' }}
-                      >{`$${orderSuffix?.shippingCharge}`}</p>
+                      >{`$${orderSuffix?.shippingCharge}`}</div>
                     </div>
                     <div
                       style={{
@@ -376,15 +388,18 @@ export const BuyerTemplate = ({ body }) => {
                       </p> */}
                     </div>
                     <div
+                      className={styles.spacing}
                       style={{
                         display: 'flex',
                         justifyContent: 'space-between',
                       }}
                     >
-                      <p>Total : </p>
-                      <p>{`$${
-                        subTotal + tax + orderSuffix?.shippingCharge
-                      }`}</p>
+                      <div>Total : </div>
+                      <div>{`$${(
+                        subTotal +
+                        tax +
+                        orderSuffix?.shippingCharge
+                      ).toFixed(2)}`}</div>
                     </div>
                   </div>
                 </div>
@@ -406,34 +421,44 @@ export const BuyerTemplate = ({ body }) => {
         >
           <div
             className={styles.flex}
-            style={{ justifyContent: 'space-between' }}
+            style={{ justifyContent: 'space-between', marginBottom: '2px' }}
           >
             <b>Deposit Payment</b>
             {/* <p className={styles.leftmargin}>{`-`}</p> */}
-            <p className={styles.leftmargin}>
-              {'$' + orderSuffix?.preorderInfo?.depositPayment.toFixed(2) ??
-                '-'}
-            </p>
+            <div className={styles.leftmargin}>
+              {'$' +
+                (orderSuffix?.preorderInfo?.depositPayment.toFixed(2) ??
+                  '0.00')}
+            </div>
           </div>
+          {orderSuffix?.preorderInfo?.depositPayment > 0 ? (
+            <div className={styles.taxtextfont}>
+              including taxes & shipping charges
+            </div>
+          ) : null}
           <div
             className={styles.flex}
-            style={{ justifyContent: 'space-between' }}
+            style={{ justifyContent: 'space-between', marginBottom: '2px' }}
           >
             <b>Balance Payment</b>
             {/* <p className={styles.leftmargin}>{`$${(subTotal / 100) + tax}`}</p> */}
-            <p className={styles.leftmargin}>
-              {'$' + orderSuffix?.preorderInfo?.balancePayment.toFixed(2)}
-            </p>
+            <div className={styles.leftmargin}>
+              {'$' +
+                (orderSuffix?.preorderInfo?.balancePayment.toFixed(2) ??
+                  '0.00')}
+            </div>
           </div>
+          {<div className={styles.taxTextFont}>including taxes</div>}
           <div
             className={styles.flex}
             style={{ justifyContent: 'space-between' }}
           >
             <b>Balance Due</b>
             {/* <p className={styles.leftmargin}>{`$0.00`}</p> */}
-            <p className={styles.leftmargin}>
-              {'$' + orderSuffix?.preorderInfo?.balanceDue.toFixed(2)}
-            </p>
+            <div className={styles.leftmargin}>
+              {'$' +
+                (orderSuffix?.preorderInfo?.balanceDue.toFixed(2) ?? '0.00')}
+            </div>
           </div>
         </div>
       </div>

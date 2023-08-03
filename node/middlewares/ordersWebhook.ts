@@ -69,28 +69,33 @@ export async function ordersWebhook(ctx: any) {
     // console.log('SELLER IDS LENGTH - '+ details.data + ' no of orders invoiced - ' + orderDetails.noOfOrdersInvoiced)
     // if (orderDetails.noOfSellers === orderDetails.noOfOrdersInvoiced || orderDetails.noOfSellers === 1) {
     console.log('IN NOTIFY BUYER')
+    const brandName = orderDetails?.items[0]?.additionalInfo?.brandName ?? ''
     const buyerDetails = await notifyBuyer(
       payload.OrderId,
       orderDetails?.clientProfileData?.email,
+      orderDetails.clientProfileData.firstName,
       account,
       orderDetails.invoiceNumber,
       customFields,
       workspace,
-      ctx
+      ctx,
+      brandName
     )
     console.log(buyerDetails)
     // }
-    sellerEmail.forEach(async (data: any) => {
-      await notifySeller(
-        payload.OrderId,
-        data,
-        account,
-        invoiceNumber.Id,
-        customFields,
-        workspace,
-        ctx
-      )
-    })
+    if (orderDetails) {
+      sellerEmail.forEach(async (data: any) => {
+        await notifySeller(
+          payload.OrderId,
+          data,
+          account,
+          invoiceNumber.Id,
+          customFields,
+          workspace,
+          ctx
+        )
+      })
+    }
     return
   } catch (e) {
     console.log(e)

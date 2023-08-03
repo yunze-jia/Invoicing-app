@@ -62,6 +62,7 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
     depositPayment: 0,
     balancePayment: 0,
     balanceDue: 0,
+    isPreOrder: false,
   }
   let priceWithShipment =
     orderDetails.totals.filter((res: any) => res.id === 'Shipping')[0].value /
@@ -100,14 +101,16 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       item.productId = allItems.productId
       // }
       // if (isPreorder) {
-      const { depositPayment, balancePayment, balanceDue } =
+      const { depositPayment, balancePayment, balanceDue, isPreOrder } =
         await extractPreOrderInfo(preOrderDetails, item)
       preorderPayment.depositPayment =
         preorderPayment.depositPayment + depositPayment
       preorderPayment.balancePayment =
         preorderPayment.balancePayment + balancePayment
       preorderPayment.balanceDue = preorderPayment.balanceDue + balanceDue
+      preorderPayment.isPreOrder = isPreOrder
       // }
+      item.isPreOrder = preorderPayment.isPreOrder
 
       changeobj.push({
         id: item.id,
@@ -125,6 +128,7 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
           account,
           authToken
         ),
+        isPreOrder: item.isPreOrder,
       })
     }
 
@@ -192,13 +196,17 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       item.sellingPrice = allItems.sellingPrice
       item.productId = allItems.productId
 
-      const { depositPayment, balancePayment, balanceDue } =
+      const { depositPayment, balancePayment, balanceDue, isPreOrder } =
         await extractPreOrderInfo(preOrderDetails, item)
       preorderPayment.depositPayment =
         preorderPayment.depositPayment + depositPayment
       preorderPayment.balancePayment =
         preorderPayment.balancePayment + balancePayment
       preorderPayment.balanceDue = preorderPayment.balanceDue + balanceDue
+      preorderPayment.isPreOrder = isPreOrder
+
+      item.isPreOrder = preorderPayment.isPreOrder
+
       items.push({
         id: item.id,
         name: item.name,
@@ -215,6 +223,7 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
           account,
           authToken
         ),
+        isPreOrder: item.isPreOrder,
       })
     }
     const allItemInvoiced = await checkIfAllItemsAreInvoiced(
@@ -278,17 +287,20 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
   ).length
 
   orderDetails.invoiceNumber = invoiceDetails.invoiceNumber
+  orderDetails.allItemInvoiced = invoiceDetails.allItemInvoiced
   return orderDetails
 }
 
 export async function notifyBuyer(
   orderId: any,
   useremail: string,
+  firstName: string,
   account: string,
   invoiceNo: string,
   customFields: any,
   workspace: any,
-  ctx: any
+  ctx: any,
+  brandName: string
 ) {
   const {
     clients: { email },
@@ -313,10 +325,14 @@ export async function notifyBuyer(
     applicationName: 'email',
     logEvidence: true,
     jsonData: {
+      orderId: orderId,
+      firstName: firstName,
+      invoiceNumber: invoiceNo,
       cc: customFields.marketplace_email,
       email: useremail,
       invoiceUrl: `https://${workspace}--${account}.myvtex.com/invoice/buyer/${orderId}/${invoiceNo}`,
       message: '',
+      brandName,
     },
   }
   const emailRes = await email.notify(account, payload)

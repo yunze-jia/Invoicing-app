@@ -133,8 +133,8 @@ td {
 }
 
 .logo{
-  width: 28% ;   
-  margin-left: auto;
+  width: 30% ;   
+  margin-left: 34%;
   margin-right: auto;
   display: block;
 }
@@ -163,7 +163,7 @@ td {
 
 .info{
   display: grid;
-  margin-top: 10%;
+  margin-top: 5%;
 }
 
 .greeting{
@@ -174,10 +174,12 @@ td {
 
 .textInfo{
   margin: 5px;
-  font-size: 15px;
+  font-size: 12px;
 }
 
 .flex{
+  margin-top:7px;
+  margin-bottom: 7px;
   display: flex;
   align-items: center;
 }
@@ -193,13 +195,27 @@ td {
 
 .invoiceinfo{
   font-size: large;
+  margin-top:7px;
+  margin-bottom:5px
 }
 
 .tablemargin{
-  margin-bottom: 5%;
-  margin-top: 5%;
+  margin-bottom: 3%;
+  margin-top: 3%;
 }
 
 .printmargin{
   margin-right: 9%;
+}
+
+.taxTextFont{
+  font-size: 10px;
+}
+
+.spacing{
+  margin-top:7px;
+  margin-bottom: 7px;
+}
+.taxtextfont{
+  font-size: 10px;
 }
