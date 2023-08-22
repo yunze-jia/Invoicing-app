@@ -286,7 +286,10 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
     }
   ).length
 
+  console.log('TRACKING URL - ', invoiceDetails.trackingUrl)
+
   orderDetails.invoiceNumber = invoiceDetails.invoiceNumber
+  orderDetails.trackingUrl = invoiceDetails.trackingUrl
   orderDetails.allItemInvoiced = invoiceDetails.allItemInvoiced
   return orderDetails
 }
@@ -300,7 +303,8 @@ export async function notifyBuyer(
   customFields: any,
   workspace: any,
   ctx: any,
-  brandName: string
+  brandName: string,
+  trackingUrl: string
 ) {
   const {
     clients: { email },
@@ -333,6 +337,7 @@ export async function notifyBuyer(
       invoiceUrl: `https://${workspace}--${account}.myvtex.com/invoice/buyer/${orderId}/${invoiceNo}`,
       message: '',
       brandName,
+      trackingUrl,
     },
   }
   const emailRes = await email.notify(account, payload)

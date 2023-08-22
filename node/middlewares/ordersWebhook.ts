@@ -68,7 +68,8 @@ export async function ordersWebhook(ctx: any) {
     // }
     // console.log('SELLER IDS LENGTH - '+ details.data + ' no of orders invoiced - ' + orderDetails.noOfOrdersInvoiced)
     // if (orderDetails.noOfSellers === orderDetails.noOfOrdersInvoiced || orderDetails.noOfSellers === 1) {
-    console.log('IN NOTIFY BUYER')
+    console.log('IN NOTIFY BUYER & Tracking Url - ', orderDetails.trackingUrl)
+    const trackingUrl = orderDetails.trackingUrl
     const brandName = orderDetails?.items[0]?.additionalInfo?.brandName ?? ''
     const buyerDetails = await notifyBuyer(
       payload.OrderId,
@@ -79,7 +80,8 @@ export async function ordersWebhook(ctx: any) {
       customFields,
       workspace,
       ctx,
-      brandName
+      brandName,
+      trackingUrl
     )
     console.log(buyerDetails)
     // }
