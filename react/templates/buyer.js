@@ -58,6 +58,7 @@ export const BuyerTemplate = ({ body }) => {
   let placedDate = null
   let subTotal = 0
   let tax = 0
+  let totalTax = 0
   let issueDate = null
   let discount = null
   let grandTotals = 0
@@ -97,6 +98,15 @@ export const BuyerTemplate = ({ body }) => {
             orderSuffix = newOrder[invoiceUrl]
             let shippingCost = 0
 
+            total = (newOrder?.grandTotal/100).toFixed(2)
+
+            //Total tax
+            totalTax = (newOrder?.totals.filter((res)=>{
+              if(res.id === 'Tax'){
+                return res
+              }
+            })[0]?.value)/100 
+
             //Taking out Discount
             newOrder?.totals.map((totals, index) => {
               if (totals.id === 'Discounts')
@@ -126,11 +136,11 @@ export const BuyerTemplate = ({ body }) => {
             const issuedStringDate = issueNewDate.toString()
             issueDate = issuedStringDate.split(' ')
 
-            const calculateGrandTotal = (subTotal, discount, price) => {
-              total = (subTotal / 100 - discount / 100 + price / 100).toFixed(2)
-              grandTotals = Number(total) + grandTotals
-              return total
-            }
+            // const calculateGrandTotal = (subTotal, discount, price) => {
+            //   total = (subTotal / 100 - discount / 100 + price / 100).toFixed(2)
+            //   grandTotals = Number(total) + grandTotals
+            //   return total
+            // }
 
             return (
               <div
@@ -345,7 +355,7 @@ export const BuyerTemplate = ({ body }) => {
                       }}
                     >
                       <div style={{ color: '#979899' }}>Subtotal</div>
-                      <div style={{ color: '#979899' }}>{`$${subTotal}`}</div>
+                      <div style={{ color: '#979899' }}>{`$${subTotal.toFixed(2)}`}</div>
                     </div>
                     <div
                       className={styles.spacing}
@@ -354,8 +364,8 @@ export const BuyerTemplate = ({ body }) => {
                         justifyContent: 'space-between',
                       }}
                     >
-                      <div style={{ color: '#979899' }}>Tax : </div>
-                      <div style={{ color: '#979899' }}>{`$${tax.toFixed(
+                      <div style={{ color: '#979899' }}>Tax Incl Shipping tax : </div>
+                      <div style={{ color: '#979899' }}>{`$${totalTax.toFixed(
                         2
                       )}`}</div>
                     </div>
@@ -367,7 +377,7 @@ export const BuyerTemplate = ({ body }) => {
                       }}
                     >
                       <div style={{ color: '#979899' }}>
-                        Shipping Incl GST :{' '}
+                        Shipping :{' '}
                       </div>
                       <div
                         style={{ color: '#979899' }}
@@ -395,11 +405,7 @@ export const BuyerTemplate = ({ body }) => {
                       }}
                     >
                       <div>Total : </div>
-                      <div>{`$${(
-                        subTotal +
-                        tax +
-                        orderSuffix?.shippingCharge
-                      ).toFixed(2)}`}</div>
+                      <div>{`$${total}`}</div>
                     </div>
                   </div>
                 </div>

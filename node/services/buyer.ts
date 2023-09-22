@@ -63,13 +63,17 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
     balancePayment: 0,
     balanceDue: 0,
     isPreOrder: false,
+    itemTax:0
   }
-  let priceWithShipment =
-    orderDetails.totals.filter((res: any) => res.id === 'Shipping')[0].value /
-    100
+  let priceWithShipment = getTotalsWithId('Shipping',orderDetails.totals)
+    // orderDetails.totals.filter((res: any) => res.id === 'Shipping')[0].value /
+    // 100
+
+    let totalTax = getTotalsWithId('Tax',orderDetails.totals)
 
   let allItems
   let shippingCost
+  let remainingTax
   const invoiceDetails: any = !vbaseOrderDetails
     ? orderDetails.packageAttachment.packages[0]
     : await filterRecentlyInvoicedItem(
@@ -101,7 +105,7 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       item.productId = allItems.productId
       // }
       // if (isPreorder) {
-      const { depositPayment, balancePayment, balanceDue, isPreOrder } =
+      const { depositPayment, balancePayment, balanceDue, isPreOrder, itemTax } =
         await extractPreOrderInfo(preOrderDetails, item)
       preorderPayment.depositPayment =
         preorderPayment.depositPayment + depositPayment
@@ -109,6 +113,7 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
         preorderPayment.balancePayment + balancePayment
       preorderPayment.balanceDue = preorderPayment.balanceDue + balanceDue
       preorderPayment.isPreOrder = isPreOrder
+      preorderPayment.itemTax = preorderPayment.itemTax + itemTax
       // }
       item.isPreOrder = preorderPayment.isPreOrder
 
@@ -136,14 +141,18 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       orderDetails.packageAttachment.packages,
       orderDetails.items
     )
+     
+    remainingTax = totalTax - preorderPayment.itemTax
+    console.log(`REMAINING TAX - ${remainingTax}  AND ITEM TAX -  ${preorderPayment.itemTax}`);
+    
     console.log('All Items are invoiced', allItemInvoiced)
     if (preorderPayment.depositPayment !== 0) {
       preorderPayment.depositPayment = allItemInvoiced
-        ? preorderPayment.depositPayment + priceWithShipment
+        ? preorderPayment.depositPayment + priceWithShipment + remainingTax
         : preorderPayment.depositPayment
     } else {
       preorderPayment.balancePayment = allItemInvoiced
-        ? preorderPayment.balancePayment + priceWithShipment
+        ? preorderPayment.balancePayment + priceWithShipment + remainingTax
         : preorderPayment.balancePayment
     }
 
@@ -196,7 +205,7 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       item.sellingPrice = allItems.sellingPrice
       item.productId = allItems.productId
 
-      const { depositPayment, balancePayment, balanceDue, isPreOrder } =
+      const { depositPayment, balancePayment, balanceDue, isPreOrder, itemTax } =
         await extractPreOrderInfo(preOrderDetails, item)
       preorderPayment.depositPayment =
         preorderPayment.depositPayment + depositPayment
@@ -204,7 +213,7 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
         preorderPayment.balancePayment + balancePayment
       preorderPayment.balanceDue = preorderPayment.balanceDue + balanceDue
       preorderPayment.isPreOrder = isPreOrder
-
+      preorderPayment.itemTax = preorderPayment.itemTax + itemTax
       item.isPreOrder = preorderPayment.isPreOrder
 
       items.push({
@@ -230,14 +239,15 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       orderDetails.packageAttachment.packages,
       orderDetails.items
     )
+    remainingTax = totalTax - preorderPayment.itemTax
     console.log({ items })
     if (preorderPayment.depositPayment !== 0) {
       preorderPayment.depositPayment = allItemInvoiced
-        ? preorderPayment.depositPayment + priceWithShipment
+        ? preorderPayment.depositPayment + priceWithShipment + remainingTax
         : preorderPayment.depositPayment
     } else {
       preorderPayment.balancePayment = allItemInvoiced
-        ? preorderPayment.balancePayment + priceWithShipment
+        ? preorderPayment.balancePayment + priceWithShipment + remainingTax
         : preorderPayment.balancePayment
     }
     saveObj[newOrderId[1]] = {
@@ -309,6 +319,8 @@ export async function notifyBuyer(
   const {
     clients: { email },
   } = ctx
+
+  const host = customFields?.baseUrl ?? `${workspace}--${account}.myvtex.com`
   console.log(
     'BUYER ******* the order id is : ' +
       orderId +
@@ -321,7 +333,7 @@ export async function notifyBuyer(
   )
   console.log(
     'buyer invoice - ',
-    `https://${workspace}--${account}.myvtex.com/invoice/buyer/${orderId}/${invoiceNo}`
+    `https://${host}/invoice/buyer/${orderId}/${invoiceNo}`
   )
 
   const payload = {
@@ -334,7 +346,7 @@ export async function notifyBuyer(
       invoiceNumber: invoiceNo,
       cc: customFields.marketplace_email,
       email: useremail,
-      invoiceUrl: `https://${workspace}--${account}.myvtex.com/invoice/buyer/${orderId}/${invoiceNo}`,
+      invoiceUrl: `https://${host}/invoice/buyer/${orderId}/${invoiceNo}`,
       message: '',
       brandName,
       trackingUrl,
@@ -344,4 +356,11 @@ export async function notifyBuyer(
   console.log('Buyer RESPONSE FROM EMAIL REQUEST  - ', { emailRes })
 
   return emailRes
+}
+
+
+function getTotalsWithId(totalsId:string, totals:any[]){
+ const value =  totals.filter((res: any) => res.id === totalsId)[0].value /
+    100
+ return value
 }

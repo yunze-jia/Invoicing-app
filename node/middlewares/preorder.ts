@@ -40,11 +40,13 @@ export async function getPreOrderInfo(
 export async function extractPreOrderInfo(preOrder: any, item: any) {
   // let preorderInfo = []
   let preorderObj = {
+    itemTax:0,
     depositPayment: 0,
     balancePayment: 0,
     balanceDue: 0,
     isPreOrder: false,
   }
+  preorderObj.itemTax = preorderObj.itemTax + (item.tax/100)
 
   console.log('ITEM - SKU INFO - ', { item })
   if (

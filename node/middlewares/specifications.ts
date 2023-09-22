@@ -58,7 +58,6 @@ export async function getProductSpecifications(
       { headers }
     )
     .then((res) => {
-      console.log('Product specifications success full response - ', res)
       console.log('Product specifications success - ', res.data)
 
       return {

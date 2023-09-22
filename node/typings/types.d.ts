@@ -3,4 +3,5 @@ interface Preorder {
   balancePayment: number
   balanceDue: number
   isPreOrder: boolean
+  itemTax: number
 }
