@@ -5,6 +5,11 @@ import { getVbaseData } from './vbase';
 // const FormData = require("form-data");
 export async function getBuyerInvoiceDetails(ctx: any) {
   const newOrderId: any = ctx.vtex.route.params.orderId
+  if(newOrderId === '200'){
+    ctx.body='Wakedup'
+    ctx.status = 200
+    return
+  }
   console.log('getBuyerInvoiceDetails  ==> ', newOrderId)
   const {
     vtex: { account, authToken },

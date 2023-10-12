@@ -83,3 +83,73 @@ There are three types of recipients who are sent invoices by the app: marketplac
 | Marketplace admin | Receive all the invoice copies for the seller and buyer |
 | Seller | Receive the invoice for sold products |
 | Buyer | Receive the invoice for bought products |
+
+### FYI
+For unhelathy service issue while getting the data for invoice. We have created two cron schedulers for 2 endpoints using below CURL. If in future. Invoice app is installed in any other store or In whola if existing cron schedulers are expired. We can use this endpoint to create one.
+
+
+curl --location 'http://whola.vtexcommercestable.com.br/api/scheduler/master/vtexasia.native-invoicing-app?version=4' \
+--header 'VtexIdClientAutCookie: token' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: janus_sid=8016b33c-e2c3-4547-a0af-3611e391ca58' \
+--data '{
+    "request": {
+        "uri": "https://www.whola.com.au/_v/orders/buyer/200",
+        "method": "GET",
+        "headers": null
+    },
+    "scheduler": {
+        "endDate": "2030-01-01T00:00:00+00:00",
+        "expression": "* * * * *"
+    }
+}'
+
+{
+ "id": "1cc29e35-2d0c-43bb-b498-dc9cc5ed4f42",
+ "workspace": "master",
+ "app": "vtexasia.native-invoicing-app",
+ "request": {
+ "uri": "https://whola.myvtex.com/_v/orders/buyer/200",
+ "method": "GET",
+ "headers": null,
+ "body": null
+ },
+ "retry": {
+ "delay": {
+ "addMinutes": 10,
+ "addHours": 0,
+ "addDays": 0
+ },
+ "times": 3,
+ "backOffRate": 1.0
+ },
+ "attempt": 0,
+ "endDate": "2030-01-01T00:00:00+00:00",
+ "expression": "* * * * *",
+ "NextExecution": "2023-10-12T07:12:00Z"
+}
+
+{
+ "id": "80ca0491-7255-4136-a17a-e90ef11bebd3",
+ "workspace": "master",
+ "app": "vtexasia.native-invoicing-app",
+ "request": {
+ "uri": "https://www.whola.com.au/_v/orders/buyer/200",
+ "method": "GET",
+ "headers": null,
+ "body": null
+ },
+ "retry": {
+ "delay": {
+ "addMinutes": 10,
+ "addHours": 0,
+ "addDays": 0
+ },
+ "times": 3,
+ "backOffRate": 1.0
+ },
+ "attempt": 0,
+ "endDate": "2030-01-01T00:00:00+00:00",
+ "expression": "* * * * *",
+ "NextExecution": "2023-10-12T08:10:00Z"
+}
