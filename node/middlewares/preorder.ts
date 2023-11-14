@@ -72,18 +72,18 @@ export async function extractPreOrderInfo(preOrder: any, item: any) {
           preorderObj.isPreOrder = preorderitem.isProductPreorder
           preorderObj.balancePayment =
             preorderObj.balancePayment +
-            totalWithoutShippingCharge -
-            totalWithoutShippingCharge * (percent / 100)
+            // totalWithoutShippingCharge -
+            (remainingCharge === 0 ? totalWithoutShippingCharge : totalWithoutShippingCharge * (percent / 100))
 
           preorderObj.depositPayment =
             preorderObj.depositPayment +
             totalWithoutShippingCharge * (percent / 100)
 
           preorderObj.balanceDue =
-            preorderObj.balanceDue +
-            (totalWithoutShippingCharge - preorderObj.depositPayment)
+            preorderObj.balanceDue + (remainingCharge === 0 ? 0 :
+            (totalWithoutShippingCharge - totalWithoutShippingCharge*(percent/100)))
         } else {
-          preorderObj.balancePayment = totalWithoutShippingCharge
+          preorderObj.balancePayment = preorderObj.balancePayment + totalWithoutShippingCharge
         }
       }
     }

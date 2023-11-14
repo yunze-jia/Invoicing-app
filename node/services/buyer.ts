@@ -146,19 +146,23 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
     console.log(`REMAINING TAX - ${remainingTax}  AND ITEM TAX -  ${preorderPayment.itemTax}`);
     
     console.log('All Items are invoiced', allItemInvoiced)
-    if (preorderPayment.depositPayment !== 0) {
-      preorderPayment.depositPayment = allItemInvoiced
-        ? preorderPayment.depositPayment + priceWithShipment + remainingTax
-        : preorderPayment.depositPayment
-    } else {
+    // if (preorderPayment.depositPayment !== 0) {
+    //   preorderPayment.depositPayment = allItemInvoiced
+    //     ? preorderPayment.depositPayment + priceWithShipment + remainingTax
+    //     : preorderPayment.depositPayment
+    // } else {
+
       preorderPayment.balancePayment = allItemInvoiced
         ? preorderPayment.balancePayment + priceWithShipment + remainingTax
         : preorderPayment.balancePayment
-    }
+    // }
 
     vbaseOrderDetails[newOrderId[1]] = !vbaseOrderDetails[newOrderId[1]]
       ? {}
       : vbaseOrderDetails[newOrderId[1]]
+
+    preorderPayment.itemTax = allItemInvoiced ? preorderPayment.itemTax + remainingTax : preorderPayment.itemTax  
+    // preorderPayment.balancePayment = allItemInvoiced ? preorderPayment.balancePayment + remainingTax : preorderPayment.balancePayment
     vbaseOrderDetails[newOrderId[1]][invoiceDetails.invoiceNumber] = {
       items: changeobj,
       invoiceNumber: invoiceDetails.invoiceNumber,
@@ -241,15 +245,16 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
     )
     remainingTax = totalTax - preorderPayment.itemTax
     console.log({ items })
-    if (preorderPayment.depositPayment !== 0) {
-      preorderPayment.depositPayment = allItemInvoiced
-        ? preorderPayment.depositPayment + priceWithShipment + remainingTax
-        : preorderPayment.depositPayment
-    } else {
+    // if (preorderPayment.depositPayment !== 0) {
+    //   preorderPayment.depositPayment = allItemInvoiced
+    //     ? preorderPayment.depositPayment + priceWithShipment + remainingTax
+    //     : preorderPayment.depositPayment
+    // } else {
       preorderPayment.balancePayment = allItemInvoiced
         ? preorderPayment.balancePayment + priceWithShipment + remainingTax
         : preorderPayment.balancePayment
-    }
+    // }
+    preorderPayment.itemTax = allItemInvoiced ? preorderPayment.itemTax + remainingTax : preorderPayment.itemTax
     saveObj[newOrderId[1]] = {
       [invoiceDetails.invoiceNumber]: {
         items: items,
