@@ -1,3 +1,4 @@
+import { addLog } from '../masterdata/logs'
 import {
   checkIfAllItemsAreInvoiced,
   extractPreOrderInfo,
@@ -21,7 +22,21 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
   let saveToVbaseResponse
   const newOrderId = orderId.split('-')
   const orderDetails = await orderClient.order(orderId)
+  addLog(ctx,{
+    orderId: newOrderId[0],
+    invoiceId:null,
+    skuId:null,
+    message:'Getting Order!',
+    body:JSON.stringify(orderDetails)
+  })
   const vbaseOrderDetails: any = await getVbaseData(ctx, newOrderId[0])
+  addLog(ctx,{
+    orderId: newOrderId[0],
+    invoiceId:null,
+    skuId:null,
+    message:'Getting vbase!',
+    body:JSON.stringify(vbaseOrderDetails)
+  })
   console.log('Vbase order details - ', { vbaseOrderDetails })
   console.log('Get ORder by Id  - ', newOrderId[0])
   let shippingData = orderDetails.shippingData
@@ -42,8 +57,13 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
     newOrderId[0],
     customFields
   )
-  console.log('PREORDER INFO - ', preOrderDetails)
-
+  addLog(ctx,{
+    orderId: newOrderId[0],
+    invoiceId:null,
+    skuId:null,
+    message:'Getting Preorder Info!',
+    body:JSON.stringify(preOrderDetails)
+  })
   let isPreorder = await findEachItemPreOrder(
     preOrderDetails.products,
     orderDetails.items,
@@ -276,6 +296,17 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
     console.log({ saveObj })
     saveToVbaseResponse = await saveVbaseData(newOrderId[0], saveObj, ctx)
   }
+  addLog(ctx,{
+    orderId: orderId,
+    invoiceId:invoiceDetails.invoiceNumber,
+    skuId:null,
+    message:'After saving the invoice data into vbase!',
+    body:JSON.stringify({
+      preOrderDetails,
+      isPreorder,
+      invoiceDetails
+    })
+  })
   const vbaseOrderDetails1: any = await getVbaseData(ctx, newOrderId[0])
 
   console.log('Data Responses - VBase : ', {

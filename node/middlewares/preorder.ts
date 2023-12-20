@@ -46,7 +46,7 @@ export async function extractPreOrderInfo(preOrder: any, item: any) {
     balanceDue: 0,
     isPreOrder: false,
   }
-  preorderObj.itemTax = preorderObj.itemTax + (item.tax/100)
+  preorderObj.itemTax = preorderObj.itemTax + (item.tax/100) * item.quantity
 
   console.log('ITEM - SKU INFO - ', { item })
   if (

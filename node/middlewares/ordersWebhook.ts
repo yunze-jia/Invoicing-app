@@ -1,6 +1,6 @@
 import { json } from 'co-body'
 import { createDocumentInvoice } from '../masterdata/invoice'
-import { createLogsSchema } from '../masterdata/logs'
+import { addLog, createLogsSchema } from '../masterdata/logs'
 import { buildBuyerInvoiceInfo, notifyBuyer } from '../services/buyer'
 import {
   extractSellerIds,
@@ -9,14 +9,16 @@ import {
 } from '../services/seller'
 
 export async function trigger(ctx: any, next: () => Promise<any>) {
-  const payload = await json(ctx.req)
-  console.log('Invoice triggered - ', payload)
+  // const payload = await json(ctx.req)
+  console.log('Invoice triggered - ', ctx.body ?? ctx)
   ctx.status = 200
   await next()
 }
 
 export async function ordersWebhook(ctx: any) {
   const payload: any = await json(ctx.req)
+  // console.log('the ctx req: ', ctx.req)
+  console.log('the ctx  : ', ctx)
   console.log('the payload is  : ', payload)
   await createLogsSchema(ctx)
   //Checking if order hook is created for the first time.
@@ -26,6 +28,12 @@ export async function ordersWebhook(ctx: any) {
     ctx.body = ctx.req
     return
   }
+
+  
+  const log = {
+    invoiceId:null,skuId:null, orderId: payload.OrderId, message: 'Webhooks Called!',body: JSON.stringify(payload)
+  }
+  addLog(ctx,log)
 
   const {
     vtex: { account, authToken },

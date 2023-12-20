@@ -1,5 +1,5 @@
 const DATA_ENTITY = 'vtexasia_logs_test'
-const SCHEMA = 'native-invoice-test'
+const SCHEMA = 'native-invoice'
 
 export async function createLogsSchema(ctx: any) {
   const {
@@ -20,11 +20,21 @@ export async function createLogsSchema(ctx: any) {
     // });
 
     if (!schema) {
+      console.log('Schema creation');
+      
       await masterdata.createOrUpdateSchema({
         dataEntity: DATA_ENTITY,
         schemaName: SCHEMA,
         schemaBody: {
           properties: {
+            orderId:{
+              type: 'string',
+              title: 'Order Id',
+            },
+            invoiceId:{
+              type: 'string',
+              title: 'Invoice Id',
+            },
             skuId: {
               type: 'string',
               title: 'Vtex SKU Id',
@@ -38,12 +48,12 @@ export async function createLogsSchema(ctx: any) {
               title: 'Body',
             },
           },
-          'v-indexed': ['skuId'],
+          'v-indexed': ['skuId','orderId','invoiceId'],
           'v-security': {
             allowGetAll: false,
-            publicRead: ['id', 'skuId', 'message', 'body'],
-            publicWrite: ['skuId', 'message', 'body'],
-            publicFilter: ['skuId', 'message', 'body'],
+            publicRead: ['id', 'orderId', 'skuId','invoiceId', 'message', 'body'],
+            publicWrite: ['orderId', 'skuId', 'invoiceId', 'message', 'body'],
+            publicFilter: ['orderId', 'skuId', 'invoiceId', 'message', 'body'],
           },
         },
       })
@@ -54,7 +64,7 @@ export async function createLogsSchema(ctx: any) {
     }
   } catch (e) {
     console.log(e.response)
-    if (e.response.status === 304) {
+    if (e?.response?.status === 304) {
       return { isError: false }
     }
     return {
@@ -66,7 +76,9 @@ export async function createLogsSchema(ctx: any) {
 export async function addLog(
   ctx: any,
   log: {
-    skuId: string | null
+    invoiceId: string | null
+    skuId: string | null,
+    orderId: string | null
     message: string | null
     body: string | null
   }
@@ -84,6 +96,8 @@ export async function addLog(
       skuId: log.skuId ?? '',
       message: log.message ?? '',
       body: log.body ?? '',
+      orderId: log.orderId ?? '',
+      invoiceId: log.invoiceId ?? ''
     },
   })
 
