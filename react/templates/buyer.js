@@ -238,6 +238,15 @@ export const BuyerTemplate = ({ body }) => {
                       </div>
                       <div>
                         <div className={styles.invoiceinfo}>
+                          <b>Order Id</b>
+                        </div>
+                        <div>
+                          {/* <p>{`${order?.invoiceNumber}`}</p> */}
+                          <div>{`${orderId ?? ''}`}</div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className={styles.invoiceinfo}>
                           <b>Whola Pty Ltd</b>
                         </div>
                         <div>
@@ -306,28 +315,28 @@ export const BuyerTemplate = ({ body }) => {
                         // total=(subTotal-discount+((order.vbase.shippingData.logisticsInfo[0].price)/10))
                         return (
                           <tr>
-                            <td style={{ textAlign: 'center' }}>{item?.id}</td>
-                            <td style={{ textAlign: 'center' }}>
-                              {item.refId}
+                            <td style={{ textAlign: 'center', fontSize: 'smaller' }}>{item?.name}</td>
+                            <td style={{ textAlign: 'center', fontSize: 'smaller' }}>
+                              {item?.detailUrl}
                               {/* {item?.description ?? '-'} */}
                             </td>
-                            <td style={{ textAlign: 'center' }}>
+                            <td style={{ textAlign: 'center', fontSize: 'smaller' }}>
                               {item.isPreOrder ? 'YES' : 'NO' ?? ''}
                               {/* {item?.description ?? '-'} */}
                             </td>
-                            <td style={{ textAlign: 'center' }}>
+                            <td style={{ textAlign: 'center', fontSize: 'smaller' }}>
                               {item?.wholeSalePrice ?? '-'}
                             </td>
-                            <td style={{ textAlign: 'center' }}>
+                            <td style={{ textAlign: 'center', fontSize: 'smaller' }}>
                               ${item.unitPrice / 100}
                             </td>
-                            <td style={{ textAlign: 'center' }}>
+                            <td style={{ textAlign: 'center', fontSize: 'smaller' }}>
                               {item.quantity}
                             </td>
-                            <td style={{ textAlign: 'center' }}>
+                            <td style={{ textAlign: 'center', fontSize: 'smaller' }}>
                               ${item.tax / 100}
                             </td>
-                            <td style={{ textAlign: 'right' }}>
+                            <td style={{ textAlign: 'right', fontSize: 'smaller' }}>
                               ${(item.unitPrice / 100) * item.quantity}
                             </td>
                           </tr>

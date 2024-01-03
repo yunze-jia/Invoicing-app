@@ -123,6 +123,7 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       item.refId = allItems.refId
       item.sellingPrice = allItems.sellingPrice
       item.productId = allItems.productId
+      item.detailUrl = allItems.detailUrl
       // }
       // if (isPreorder) {
       const { depositPayment, balancePayment, balanceDue, isPreOrder, itemTax } =
@@ -140,6 +141,7 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       changeobj.push({
         id: item.id,
         name: item.name,
+        detailUrl: item.detailUrl,
         price: item.price,
         quantity: item.quantity,
         priceDefinition: item.priceDefinition,
@@ -228,6 +230,7 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       item.refId = allItems.refId
       item.sellingPrice = allItems.sellingPrice
       item.productId = allItems.productId
+      item.detailUrl = allItems.detailUrl
 
       const { depositPayment, balancePayment, balanceDue, isPreOrder, itemTax } =
         await extractPreOrderInfo(preOrderDetails, item)
@@ -243,6 +246,7 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       items.push({
         id: item.id,
         name: item.name,
+        detailUrl: item.detailUrl,
         price: item.price,
         quantity: item.quantity,
         priceDefinition: item.priceDefinition,

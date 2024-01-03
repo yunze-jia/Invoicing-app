@@ -57,7 +57,7 @@ export async function extractPreOrderInfo(preOrder: any, item: any) {
     console.log('PREORDER EXISTS', { preOrder })
 
     for (const preorderitem of preOrder.products) {
-      const {
+            const {
         remainingCharge,
         quantity,
         fullPrice,
@@ -66,7 +66,7 @@ export async function extractPreOrderInfo(preOrder: any, item: any) {
       } = preorderitem
       console.log({ remainingCharge, quantity, fullPrice })
       const totalWithoutShippingCharge =
-        (item.sellingPrice / 100) * item.quantity + item.tax / 100
+        (item.sellingPrice / 100 + item.tax / 100) * item.quantity
       if (item.id === preorderitem.skuId) {
         if (isProductPreorder) {
           preorderObj.isPreOrder = preorderitem.isProductPreorder
