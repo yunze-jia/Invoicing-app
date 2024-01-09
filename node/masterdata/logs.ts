@@ -87,7 +87,7 @@ export async function addLog(
     clients: { masterdata },
   } = ctx
 
-  console.log('ADD LOG', log)
+  // console.log('ADD LOG', log)
 
   const result = await masterdata.createDocument({
     dataEntity: DATA_ENTITY,

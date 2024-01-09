@@ -9,7 +9,7 @@ import {
   getProductSpecifications,
   getSKUSpecifications,
 } from '../middlewares/specifications'
-import { getVbaseData, saveVbaseData } from '../middlewares/vbase'
+import { getVbaseData } from '../middlewares/vbase'
 
 //
 export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
@@ -112,6 +112,9 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
   if (vbaseOrderDetails != null) {
     let changeobj = []
     for (const item of invoiceDetails.items) {
+      if(item.itemIndex === -1){
+        continue
+      }
       // if (!isPreorder) {
       allItems = orderDetails.items[item.itemIndex]
       item.tax = allItems.tax
@@ -211,15 +214,19 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
     vbaseOrderDetails[newOrderId[1]].allItemInvoiced = allItemInvoiced
     console.log('Vbase details after saving the all details', vbaseOrderDetails)
 
-    saveToVbaseResponse = await saveVbaseData(
-      newOrderId[0],
-      vbaseOrderDetails,
-      ctx
-    )
+    // saveToVbaseResponse = await saveVbaseData(
+    //   newOrderId[0],
+    //   vbaseOrderDetails,
+    //   ctx
+    // )
   } else {
     let saveObj: any = {}
     let items = []
     for (const item of invoiceDetails.items) {
+      if(item.itemIndex === -1){
+        continue
+      }
+
       allItems = orderDetails.items[item.itemIndex]
       item.tax = allItems.tax
       item.id = allItems.id
@@ -298,7 +305,7 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
 
     console.log('Order Id save-->', newOrderId[0])
     console.log({ saveObj })
-    saveToVbaseResponse = await saveVbaseData(newOrderId[0], saveObj, ctx)
+    // saveToVbaseResponse = await saveVbaseData(newOrderId[0], saveObj, ctx)
   }
   addLog(ctx,{
     orderId: orderId,

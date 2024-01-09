@@ -24,8 +24,8 @@ export async function getSKUSpecifications(
       }
     })
     .catch((err) => {
-      console.log('Product specifications Faiure - ', err.response.data)
-      console.log('Product specifications Faiure Response - ', err.response)
+      console.log('SKU specifications Faiure - ', err.response.data)
+      console.log('SKU specifications Faiure Response - ', err.response)
       return {
         isError: true,
         data: err.response.data,
