@@ -9,7 +9,7 @@ import {
   getProductSpecifications,
   getSKUSpecifications,
 } from '../middlewares/specifications'
-import { getVbaseData } from '../middlewares/vbase'
+import { getVbaseData, saveVbaseData } from '../middlewares/vbase'
 
 //
 export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
@@ -214,11 +214,11 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
     vbaseOrderDetails[newOrderId[1]].allItemInvoiced = allItemInvoiced
     console.log('Vbase details after saving the all details', vbaseOrderDetails)
 
-    // saveToVbaseResponse = await saveVbaseData(
-    //   newOrderId[0],
-    //   vbaseOrderDetails,
-    //   ctx
-    // )
+    saveToVbaseResponse = await saveVbaseData(
+      newOrderId[0],
+      vbaseOrderDetails,
+      ctx
+    )
   } else {
     let saveObj: any = {}
     let items = []
@@ -304,7 +304,7 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
 
     console.log('Order Id save-->', newOrderId[0])
     console.log({ saveObj })
-    // saveToVbaseResponse = await saveVbaseData(newOrderId[0], saveObj, ctx)
+    saveToVbaseResponse = await saveVbaseData(newOrderId[0], saveObj, ctx)
   }
   addLog(ctx,{
     orderId: orderId,
