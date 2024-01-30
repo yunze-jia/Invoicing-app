@@ -64,24 +64,29 @@ export async function extractPreOrderInfo(preOrder: any, item: any) {
         isProductPreorder,
         percent,
       } = preorderitem
-      console.log({ remainingCharge, quantity, fullPrice })
+      console.log({ remainingCharge, quantity, fullPrice, isProductPreorder })
       const totalWithoutShippingCharge =
         (item.sellingPrice / 100 + item.tax / 100) * item.quantity
       if (item.id === preorderitem.skuId) {
         if (isProductPreorder) {
+          console.log('Remaining charge - ', remainingCharge);
+          console.log('totalWithoutShippingCharge - ', totalWithoutShippingCharge);
           preorderObj.isPreOrder = preorderitem.isProductPreorder
           preorderObj.balancePayment =
             preorderObj.balancePayment +
             // totalWithoutShippingCharge -
-            (remainingCharge === 0 ? totalWithoutShippingCharge : totalWithoutShippingCharge * (percent / 100))
-
+            (remainingCharge == 0 ? totalWithoutShippingCharge : totalWithoutShippingCharge * (percent / 100))
+          console.log('balance payment - '+ preorderObj.balancePayment);
+          
           preorderObj.depositPayment =
             preorderObj.depositPayment +
             totalWithoutShippingCharge * (percent / 100)
+            console.log('deposit payment - '+ preorderObj.depositPayment);
 
           preorderObj.balanceDue =
-            preorderObj.balanceDue + (remainingCharge === 0 ? 0 :
+            preorderObj.balanceDue + (remainingCharge == 0 ? 0 :
             (totalWithoutShippingCharge - totalWithoutShippingCharge*(percent/100)))
+            console.log('balance due - '+ preorderObj.balanceDue);
         } else {
           preorderObj.balancePayment = preorderObj.balancePayment + totalWithoutShippingCharge
         }

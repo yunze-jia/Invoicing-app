@@ -7,6 +7,7 @@ import {
   getSellerEmailById,
   notifySeller,
 } from '../services/seller'
+import { getVbaseData, saveVbaseData } from './vbase'
 
 export async function trigger(ctx: any, next: () => Promise<any>) {
   // const payload = await json(ctx.req)
@@ -17,9 +18,14 @@ export async function trigger(ctx: any, next: () => Promise<any>) {
 
 export async function ordersWebhook(ctx: any) {
   const payload: any = await json(ctx.req)
-  // console.log('the ctx req: ', ctx.req)
-  console.log('the ctx  : ', ctx)
   console.log('the payload is  : ', payload)
+  const {
+    vtex: { account, authToken },
+    clients: { masterdata, apps, orderClient },
+  } = ctx
+  ctx.status = 200
+  const workspace = ctx.req.headers['x-vtex-workspace']
+
   await createLogsSchema(ctx)
   //Checking if order hook is created for the first time.
   //if first time , then send success status (As order hooks is sending a test request to check if endpoint exists)
@@ -29,18 +35,42 @@ export async function ordersWebhook(ctx: any) {
     return
   }
 
-  
-  const log = {
-    invoiceId:null,skuId:null, orderId: payload.OrderId, message: 'Webhooks Called!',body: JSON.stringify(payload)
+  const order = await orderClient.order(payload.OrderId)
+  const previousInvoiceNumbers: string = await getVbaseData(ctx, payload.OrderId)
+  console.log({previousInvoiceNumbers}+'typeof - '+ typeof previousInvoiceNumbers)
+  let invoiceNumbers = order.packageAttachment.packages[0].invoiceNumber
+  if (previousInvoiceNumbers) {
+    const checkIfAlreadyInvoiced = order.packageAttachment.packages.every(
+      (res: any) => {
+        const isInvoiceNoSaved = previousInvoiceNumbers.toString().split(',').includes(res.invoiceNumber)
+        console.log({isInvoiceNoSaved});
+        
+        invoiceNumbers = !isInvoiceNoSaved ? previousInvoiceNumbers.toString() + ',' +res.invoiceNumber : res.invoiceNumber
+        console.log(' invoice number after update -',{invoiceNumbers});
+       return isInvoiceNoSaved
+      }
+    )
+    if (checkIfAlreadyInvoiced) {
+      ctx.status = 200
+      ctx.body = ctx.req
+      return
+    }
   }
-  addLog(ctx,log)
 
-  const {
-    vtex: { account, authToken },
-    clients: { masterdata, apps },
-  } = ctx
-  ctx.status = 200
-  const workspace = ctx.req.headers['x-vtex-workspace']
+  console.log({invoiceNumbers})
+  const s = await saveVbaseData(payload.OrderId, invoiceNumbers, ctx)
+
+  console.log('vbase - ', s)
+
+  const log = {
+    invoiceId: null,
+    skuId: null,
+    orderId: payload.OrderId,
+    message: 'Webhooks Called!',
+    body: JSON.stringify(payload),
+  }
+  addLog(ctx, log)
+
   try {
     if (!payload) {
       ctx.status = 200

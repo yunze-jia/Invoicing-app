@@ -67,7 +67,6 @@ export async function getProductSpecifications(
     })
     .catch((err) => {
       console.log('Product specifications Faiure - ', err.response.data)
-      console.log('Product specifications Faiure Response - ', err.response)
       return {
         isError: true,
         data: err.response.data,

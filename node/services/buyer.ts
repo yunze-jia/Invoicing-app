@@ -249,7 +249,6 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       preorderPayment.isPreOrder = isPreOrder
       preorderPayment.itemTax = preorderPayment.itemTax + itemTax
       item.isPreOrder = preorderPayment.isPreOrder
-
       items.push({
         id: item.id,
         name: item.name,
@@ -399,8 +398,15 @@ export async function notifyBuyer(
       trackingUrl,
     },
   }
-  const emailRes = await email.notify(account, payload)
-  console.log('Buyer RESPONSE FROM EMAIL REQUEST  - ', { emailRes })
+  let emailRes;
+  try{
+     emailRes = await email.notify(account, payload)
+    console.log('Buyer RESPONSE FROM EMAIL REQUEST  - ', { emailRes })
+  }catch(e){
+    emailRes = e.message
+    console.log('Error While sending the email - ',e.message)
+  }
+  
 
   return emailRes
 }
