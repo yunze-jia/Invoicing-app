@@ -37,29 +37,56 @@ export async function ordersWebhook(ctx: any) {
 
   const order = await orderClient.order(payload.OrderId)
   const previousInvoiceNumbers: string = await getVbaseData(ctx, payload.OrderId)
-  console.log({previousInvoiceNumbers}+'typeof - '+ typeof previousInvoiceNumbers)
+  addLog(ctx,{
+    invoiceId: null,
+    skuId: null,
+    orderId: payload.OrderId,
+    message: 'previousInvoiceNumbers - checking if multiple order hooks are triggered using the invoice number.',
+    body: JSON.stringify(previousInvoiceNumbers),
+  })
+  // const previousInvoiceNumbers: string = '65baca0c90526d00017c0c06'
   let invoiceNumbers = order.packageAttachment.packages[0].invoiceNumber
   if (previousInvoiceNumbers) {
     const checkIfAlreadyInvoiced = order.packageAttachment.packages.every(
       (res: any) => {
         const isInvoiceNoSaved = previousInvoiceNumbers.toString().split(',').includes(res.invoiceNumber)
-        console.log({isInvoiceNoSaved});
-        
         invoiceNumbers = !isInvoiceNoSaved ? previousInvoiceNumbers.toString() + ',' +res.invoiceNumber : res.invoiceNumber
-        console.log(' invoice number after update -',{invoiceNumbers});
+        addLog(ctx,{
+          invoiceId: null,
+          skuId: null,
+          orderId: payload.OrderId,
+          message: 'Finding If duplicate invoice trigger using invoice number',
+          body: JSON.stringify({
+            isInvoiceNoSaved,
+            invoiceNumber:res.invoiceNumber,
+            invoiceNumbers
+          }),
+        })
        return isInvoiceNoSaved
       }
     )
     if (checkIfAlreadyInvoiced) {
+      addLog(ctx,{
+        invoiceId: null,
+        skuId: null,
+        orderId: payload.OrderId,
+        message: 'Already Invoiced!',
+        body: JSON.stringify(previousInvoiceNumbers),
+      })
       ctx.status = 200
       ctx.body = ctx.req
       return
     }
   }
-
-  console.log({invoiceNumbers})
+  
   const s = await saveVbaseData(payload.OrderId, invoiceNumbers, ctx)
-
+  addLog(ctx,{
+    invoiceId: null,
+    skuId: null,
+    orderId: payload.OrderId,
+    message: 'Saved the Invoice numbers in vbase!',
+    body: JSON.stringify(s),
+  })
   console.log('vbase - ', s)
 
   const log = {
