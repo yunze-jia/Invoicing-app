@@ -1,7 +1,11 @@
 /* eslint-disable react/jsx-key */
 import React, { useEffect, useState } from 'react'
-import { getBuyerDecEmail, getNewBuyerOrderDetails } from '../services/order'
+import {
+  getNewBuyerOrderDetails,
+  getOrderDetails,
+} from '../services/order'
 const styles = require('../index.css')
+const moment = require('moment')
 
 export const getLogo = (setLogo) => {
   const tempLogo = Array.from(
@@ -13,14 +17,13 @@ export const getLogo = (setLogo) => {
 }
 
 export const BuyerTemplate = ({ body }) => {
-  const [test, setTest] = useState(false)
   const orderId = body.params ? body.params.order_id : null
   const groupId = orderId.split('-')[1]
   let invoiceUrl = body.params ? body.params.invoice_url : null
   const type = body.params ? body.params.type : null
   const sellerId = body.params ? body.params.sellerId : null
   const [order, setOrder] = useState([])
-  const [email, setEmail] = useState([])
+  const [orderDetailsById, setOrderDetailsById] = useState([])
   const [logo, setLogo] = useState([])
   useEffect(() => {
     setOrderDetails()
@@ -28,11 +31,10 @@ export const BuyerTemplate = ({ body }) => {
   }, [])
   async function setOrderDetails() {
     if (orderId) {
+      setOrderDetailsById(await getOrderDetails(orderId))
       setOrder(
         await getNewBuyerOrderDetails(orderId, invoiceUrl, type, sellerId)
       )
-
-      setEmail(await getBuyerDecEmail(orderId))
     }
   }
 
@@ -55,13 +57,10 @@ export const BuyerTemplate = ({ body }) => {
   }
   let orderSuffix
   let total = 0
-  let placedDate = null
   let subTotal = 0
   let tax = 0
-  let totalTax = 0
   let issueDate = null
   let discount = null
-  let grandTotals = 0
   return (
     <div className={styles.aaa}>
       <div
@@ -96,17 +95,23 @@ export const BuyerTemplate = ({ body }) => {
             const isLast = vbaseKey.length === index + 1
             const newOrder = order.vbase[data]
             orderSuffix = newOrder[invoiceUrl]
+            let date = moment(orderDetailsById.creationDate ?? '').format(
+              'MMMM Do YYYY, h:mm:ss a'
+            )
+            total =
+              orderDetailsById.paymentData.transactions.reduce(
+                (initial, ongoing) => {
+                  return ongoing.payments.reduce((prev, current) => {
+                    return prev + current.value / 100
+                  }, 0)
+                },
+                0
+              ) ?? 0
             let shippingCost = 0
 
             // total = (newOrder?.grandTotal/100).toFixed(2)
             // total = subTotal
             const itemTax = orderSuffix?.preorderInfo?.itemTax
-            //Total tax
-            totalTax = (newOrder?.totals.filter((res)=>{
-              if(res.id === 'Tax'){
-                return res
-              }
-            })[0]?.value)/100 
 
             //Taking out Discount
             newOrder?.totals.map((totals, index) => {
@@ -128,7 +133,6 @@ export const BuyerTemplate = ({ body }) => {
             //placed date calculation
             const newDate = new Date(order.vbase.newInvoiceData?.creationDate)
             const stringDate = newDate.toString()
-            placedDate = stringDate.split(' ')
 
             //issued date calculation
             const issueNewDate = new Date(
@@ -145,6 +149,7 @@ export const BuyerTemplate = ({ body }) => {
 
             return (
               <div
+                key="container"
                 style={{
                   borderBottom: isLast
                     ? 'solid 0px #E3E4E6'
@@ -186,9 +191,6 @@ export const BuyerTemplate = ({ body }) => {
                       <div>
                         <p>{order?.vbase?.shippingData?.address?.city}</p>
                       </div>
-                      {/* <div>
-                        <p>{`${placedDate[2]} ${placedDate[1]} ${placedDate[3]} at ${placedDate[4]}`}</p>
-                      </div> */}
                     </div>
                     <div>
                       <div>
@@ -292,7 +294,7 @@ export const BuyerTemplate = ({ body }) => {
                 <div className={styles.tablemargin}>
                   <table>
                     <thead>
-                      <tr>
+                      <tr key="colId">
                         <th style={{ textAlign: 'center' }}>SKU</th>
                         <th style={{ textAlign: 'center' }}>Description</th>
                         <th style={{ textAlign: 'center' }}>Preorder</th>
@@ -314,29 +316,71 @@ export const BuyerTemplate = ({ body }) => {
 
                         // total=(subTotal-discount+((order.vbase.shippingData.logisticsInfo[0].price)/10))
                         return (
-                          <tr>
-                            <td style={{ textAlign: 'center', fontSize: 'smaller' }}>{item?.name}</td>
-                            <td style={{ textAlign: 'center', fontSize: 'smaller' }}>
+                          <tr key="colValueId">
+                            <td
+                              style={{
+                                textAlign: 'center',
+                                fontSize: 'smaller',
+                              }}
+                            >
+                              {item?.name}
+                            </td>
+                            <td
+                              style={{
+                                textAlign: 'center',
+                                fontSize: 'smaller',
+                              }}
+                            >
                               {item?.detailUrl}
                               {/* {item?.description ?? '-'} */}
                             </td>
-                            <td style={{ textAlign: 'center', fontSize: 'smaller' }}>
+                            <td
+                              style={{
+                                textAlign: 'center',
+                                fontSize: 'smaller',
+                              }}
+                            >
                               {item.isPreOrder ? 'YES' : 'NO' ?? ''}
                               {/* {item?.description ?? '-'} */}
                             </td>
-                            <td style={{ textAlign: 'center', fontSize: 'smaller' }}>
+                            <td
+                              style={{
+                                textAlign: 'center',
+                                fontSize: 'smaller',
+                              }}
+                            >
                               {item?.wholeSalePrice ?? '-'}
                             </td>
-                            <td style={{ textAlign: 'center', fontSize: 'smaller' }}>
+                            <td
+                              style={{
+                                textAlign: 'center',
+                                fontSize: 'smaller',
+                              }}
+                            >
                               ${item.unitPrice / 100}
                             </td>
-                            <td style={{ textAlign: 'center', fontSize: 'smaller' }}>
+                            <td
+                              style={{
+                                textAlign: 'center',
+                                fontSize: 'smaller',
+                              }}
+                            >
                               {item.quantity}
                             </td>
-                            <td style={{ textAlign: 'center', fontSize: 'smaller' }}>
+                            <td
+                              style={{
+                                textAlign: 'center',
+                                fontSize: 'smaller',
+                              }}
+                            >
                               ${item.tax / 100}
                             </td>
-                            <td style={{ textAlign: 'right', fontSize: 'smaller' }}>
+                            <td
+                              style={{
+                                textAlign: 'right',
+                                fontSize: 'smaller',
+                              }}
+                            >
                               ${(item.unitPrice / 100) * item.quantity}
                             </td>
                           </tr>
@@ -344,6 +388,13 @@ export const BuyerTemplate = ({ body }) => {
                       })}
                     </tbody>
                   </table>
+                </div>
+
+                <div>
+                  <h5>
+                    Part of order {orderDetailsById.orderId.split('-')[0]} with
+                    Total payment ${total} on {date}
+                  </h5>
                 </div>
 
                 <div
@@ -365,7 +416,9 @@ export const BuyerTemplate = ({ body }) => {
                       }}
                     >
                       <div style={{ color: '#979899' }}>Subtotal</div>
-                      <div style={{ color: '#979899' }}>{`$${subTotal.toFixed(2)}`}</div>
+                      <div style={{ color: '#979899' }}>{`$${subTotal.toFixed(
+                        2
+                      )}`}</div>
                       {/* <div style={{ color: '#979899' }}>{`$${(subTotal + orderSuffix?.shippingCharge + itemTax).toFixed(2)}`}</div> */}
                     </div>
                     <div
@@ -375,9 +428,7 @@ export const BuyerTemplate = ({ body }) => {
                         justifyContent: 'space-between',
                       }}
                     >
-                      <div style={{ color: '#979899' }}>
-                        Shipping {' '}
-                      </div>
+                      <div style={{ color: '#979899' }}>Shipping </div>
                       <div
                         style={{ color: '#979899' }}
                       >{`$${orderSuffix?.shippingCharge}`}</div>
@@ -389,7 +440,9 @@ export const BuyerTemplate = ({ body }) => {
                         justifyContent: 'space-between',
                       }}
                     >
-                      <div style={{ color: '#979899' }}>Tax Incl Shipping tax  </div>
+                      <div style={{ color: '#979899' }}>
+                        Tax Incl Shipping tax{' '}
+                      </div>
                       <div style={{ color: '#979899' }}>{`$${itemTax.toFixed(
                         2
                       )}`}</div>
@@ -415,8 +468,12 @@ export const BuyerTemplate = ({ body }) => {
                         justifyContent: 'space-between',
                       }}
                     >
-                      <div>Total  </div>
-                      <div>{`$${(subTotal + orderSuffix?.shippingCharge + itemTax).toFixed(2)}`}</div>
+                      <div>Total </div>
+                      <div>{`$${(
+                        subTotal +
+                        orderSuffix?.shippingCharge +
+                        itemTax
+                      ).toFixed(2)}`}</div>
                     </div>
                   </div>
                 </div>
@@ -425,6 +482,7 @@ export const BuyerTemplate = ({ body }) => {
           })}
       {/* <hr style={{ color: '#E3E4E6' }} /> */}
       <div
+        key="po"
         style={{
           display: 'flex',
           justifyContent: 'end',
@@ -465,7 +523,11 @@ export const BuyerTemplate = ({ body }) => {
                   '0.00')}
             </div>
           </div>
-          {<div className={styles.taxTextFont}>(including deposit and taxes)</div>}
+          {
+            <div className={styles.taxTextFont}>
+              (including deposit and taxes)
+            </div>
+          }
           <div
             className={styles.flex}
             style={{ justifyContent: 'space-between' }}
@@ -479,7 +541,7 @@ export const BuyerTemplate = ({ body }) => {
           </div>
         </div>
       </div>
-      <div className={styles.info}>
+      <div className={styles.info} key="info">
         <span className={styles.greeting}>Thanks for your order!</span>
         <span className={styles.textInfo}>
           ETAs are an estimate of arrival date

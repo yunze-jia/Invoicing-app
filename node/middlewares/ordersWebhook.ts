@@ -9,6 +9,7 @@ import {
 } from '../services/seller'
 import { getVbaseData, saveVbaseData } from './vbase'
 
+let triggers = 0;
 export async function trigger(ctx: any, next: () => Promise<any>) {
   // const payload = await json(ctx.req)
   console.log('Invoice triggered - ', ctx.body ?? ctx)
@@ -17,6 +18,8 @@ export async function trigger(ctx: any, next: () => Promise<any>) {
 }
 
 export async function ordersWebhook(ctx: any) {
+  
+  console.log('Triggers -- ',triggers++);
   const payload: any = await json(ctx.req)
   console.log('the payload is  : ', payload)
   const {
@@ -25,6 +28,16 @@ export async function ordersWebhook(ctx: any) {
   } = ctx
   ctx.status = 200
   const workspace = ctx.req.headers['x-vtex-workspace']
+  
+  const log = {
+    invoiceId: null,
+    skuId: null,
+    orderId: payload.OrderId,
+    message: 'Webhooks Called!',
+    body: JSON.stringify(payload),
+  }
+  addLog(ctx, log)
+
 
   await createLogsSchema(ctx)
   //Checking if order hook is created for the first time.
@@ -41,7 +54,7 @@ export async function ordersWebhook(ctx: any) {
     invoiceId: null,
     skuId: null,
     orderId: payload.OrderId,
-    message: 'previousInvoiceNumbers - checking if multiple order hooks are triggered using the invoice number.',
+    message: 'previousInvoiceNumbers - checking if multiple order hooks are triggered using the invoice number.'+ triggers,
     body: JSON.stringify(previousInvoiceNumbers),
   })
   // const previousInvoiceNumbers: string = '65baca0c90526d00017c0c06'
@@ -49,8 +62,11 @@ export async function ordersWebhook(ctx: any) {
   if (previousInvoiceNumbers) {
     const checkIfAlreadyInvoiced = order.packageAttachment.packages.every(
       (res: any) => {
+        console.log('Incoming invoice number from order details - ', res.invoiceNumber)
         const isInvoiceNoSaved = previousInvoiceNumbers.toString().split(',').includes(res.invoiceNumber)
+        console.log('isInvoiceNoSaved',{isInvoiceNoSaved});
         invoiceNumbers = !isInvoiceNoSaved ? previousInvoiceNumbers.toString() + ',' +res.invoiceNumber : res.invoiceNumber
+        console.log('invoiceNumbers',{invoiceNumbers});
         addLog(ctx,{
           invoiceId: null,
           skuId: null,
@@ -78,7 +94,7 @@ export async function ordersWebhook(ctx: any) {
       return
     }
   }
-  
+
   const s = await saveVbaseData(payload.OrderId, invoiceNumbers, ctx)
   addLog(ctx,{
     invoiceId: null,
@@ -88,15 +104,6 @@ export async function ordersWebhook(ctx: any) {
     body: JSON.stringify(s),
   })
   console.log('vbase - ', s)
-
-  const log = {
-    invoiceId: null,
-    skuId: null,
-    orderId: payload.OrderId,
-    message: 'Webhooks Called!',
-    body: JSON.stringify(payload),
-  }
-  addLog(ctx, log)
 
   try {
     if (!payload) {

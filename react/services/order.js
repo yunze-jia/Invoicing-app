@@ -1,7 +1,7 @@
 import axios from 'axios'
 import React from 'react'
 
-export const getOrderDetails = async (orderId, invoiceUrl, type, sellerId) => {
+export const getOrderDetails = async (orderId) => {
   const options = {
     method: 'POST',
     url: `/_v/order/${orderId}`,
@@ -16,24 +16,9 @@ export const getOrderDetails = async (orderId, invoiceUrl, type, sellerId) => {
     .then(function (response) {
       return response.data
     })
-    .catch(function (error) {})
-  debugger
-  // let invoiceNumber = await generateInvoiceNumber(orderDetails.orderId);
-  orderDetails.invoiceNumber = invoiceUrl
-  //  = orderDetails.items
-  const seller =
-    type === 'seller'
-      ? orderDetails.items.filter((res) => {
-          if (res.seller === sellerId) return res
-        })
-      : orderDetails.items
-
-  if (type != 'seller') {
-    let items = await createTableProducts(seller)
-    orderDetails.htmlItems = items
-  } else {
-    orderDetails.htmlItems = orderDetails.items
-  }
+    .catch(function (error) {
+      console.log('Error while fetching the Order Details - ',error)
+    })
   return orderDetails
 }
 
@@ -121,22 +106,5 @@ export const getSellerInfo = async (sellerId) => {
     return email.data
   } else {
     return 'something went wrong in getSellerInfo'
-  }
-}
-export const getBuyerDecEmail = async (orderId) => {
-  const options = {
-    method: 'GET',
-    url: `/_v/orders/buyerEncrptEmails/${orderId}`,
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-  }
-
-  const decrEmail = await axios.request(options)
-  if (decrEmail) {
-    return decrEmail.data
-  } else {
-    return 'something went wrong in getBuyerDecEmail'
   }
 }

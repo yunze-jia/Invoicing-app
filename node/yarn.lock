@@ -169,10 +169,10 @@
     "@types/mime" "*"
     "@types/node" "*"
 
-"@vtex/api@6.46.0":
-  version "6.46.0"
-  resolved "https://registry.yarnpkg.com/@vtex/api/-/api-6.46.0.tgz#208d14b96cbc8fd5eb6bd18fbd0c8424886e6154"
-  integrity sha512-XAvJlD1FG1GynhPXiMcayunahFCL2r3ilO5MHAWKxYvB/ljyxi4+U+rVpweeaQGpxHfhKHdfPe7qNEEh2oa2lw==
+"@vtex/api@6.46.1":
+  version "6.46.1"
+  resolved "https://registry.yarnpkg.com/@vtex/api/-/api-6.46.1.tgz#55a8755ae48f5400e7f1ed1921cd547950bb7a2a"
+  integrity sha512-geoxVvyWoQpOQ70Zmx3M8SBkRoGOS/bp9Gy26M+iCue63jofVSwmFz1zf66EaHA1PKOJNRgQPFwY+oeDE1U2lQ==
   dependencies:
     "@types/koa" "^2.11.0"
     "@types/koa-compose" "^3.2.3"
@@ -1195,6 +1195,11 @@ mkdirp-classic@^0.5.2:
   resolved "https://registry.yarnpkg.com/mkdirp-classic/-/mkdirp-classic-0.5.3.tgz#fa10c9115cc6d8865be221ba47ee9bed78601113"
   integrity sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A==
 
+moment@^2.30.1:
+  version "2.30.1"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.30.1.tgz#f8c91c07b7a786e30c59926df530b4eac96974ae"
+  integrity sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==
+
 ms@2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
@@ -1425,7 +1430,7 @@ side-channel@^1.0.4:
     get-intrinsic "^1.0.2"
     object-inspect "^1.9.0"
 
-"stats-lite@github:vtex/node-stats-lite#dist":
+stats-lite@vtex/node-stats-lite#dist:
   version "2.2.0"
   resolved "https://codeload.github.com/vtex/node-stats-lite/tar.gz/1b0d39cc41ef7aaecfd541191f877887a2044797"
   dependencies:

@@ -322,8 +322,6 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
   console.log('Data Responses - VBase : ', {
     saveToVbaseResponse,
     newOrderId,
-    orderDetails,
-    vbaseOrderDetails,
     vbaseOrderDetails1,
   })
 
