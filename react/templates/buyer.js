@@ -95,11 +95,11 @@ export const BuyerTemplate = ({ body }) => {
             const isLast = vbaseKey.length === index + 1
             const newOrder = order.vbase[data]
             orderSuffix = newOrder[invoiceUrl]
-            let date = moment(orderDetailsById.orderDetails.creationDate ?? '').format(
+            let date = moment(orderDetailsById?.orderDetails?.creationDate ?? '').format(
               'MMMM Do YYYY, h:mm:ss a'
             )
             total =
-              orderDetailsById.orderDetails.paymentData.transactions.reduce(
+              orderDetailsById?.orderDetails?.paymentData?.transactions.reduce(
                 (initial, ongoing) => {
                   return ongoing.payments.reduce((prev, current) => {
                     return prev + current.value / 100
@@ -392,7 +392,7 @@ export const BuyerTemplate = ({ body }) => {
 
                 <div>
                   <h5>
-                    Part of order {orderDetailsById.orderDetails.orderId.split('-')[0] ?? ''} with
+                    Part of order {orderDetailsById?.orderDetails?.orderId.split('-')[0] ?? ''} with
                     Total payment ${total} on {date}
                   </h5>
                 </div>
@@ -484,7 +484,7 @@ export const BuyerTemplate = ({ body }) => {
                     >
                     <div>Total paid on Checkout </div>
                       <div>{`$${(
-                        orderDetailsById?.preOrderDetails?.paidAmount ?? 0
+                        (order?.vbase?.paidAmount*1)/100 ?? 0
                       ).toFixed(2)}`}</div>
                     </div>
                   </div>

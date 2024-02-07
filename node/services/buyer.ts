@@ -22,20 +22,20 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
   let saveToVbaseResponse
   const newOrderId = orderId.split('-')
   const orderDetails = await orderClient.order(orderId)
-  addLog(ctx,{
+  addLog(ctx, {
     orderId: newOrderId[0],
-    invoiceId:null,
-    skuId:null,
-    message:'Getting Order!',
-    body:JSON.stringify(orderDetails)
+    invoiceId: null,
+    skuId: null,
+    message: 'Getting Order!',
+    body: JSON.stringify(orderDetails),
   })
   const vbaseOrderDetails: any = await getVbaseData(ctx, newOrderId[0])
-  addLog(ctx,{
+  addLog(ctx, {
     orderId: newOrderId[0],
-    invoiceId:null,
-    skuId:null,
-    message:'Getting vbase!',
-    body:JSON.stringify(vbaseOrderDetails)
+    invoiceId: null,
+    skuId: null,
+    message: 'Getting vbase!',
+    body: JSON.stringify(vbaseOrderDetails),
   })
   console.log('Vbase order details - ', { vbaseOrderDetails })
   console.log('Get ORder by Id  - ', newOrderId[0])
@@ -57,12 +57,12 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
     newOrderId[0],
     customFields
   )
-  addLog(ctx,{
+  addLog(ctx, {
     orderId: newOrderId[0],
-    invoiceId:null,
-    skuId:null,
-    message:'Getting Preorder Info!',
-    body:JSON.stringify(preOrderDetails)
+    invoiceId: null,
+    skuId: null,
+    message: 'Getting Preorder Info!',
+    body: JSON.stringify(preOrderDetails),
   })
   let isPreorder = await findEachItemPreOrder(
     preOrderDetails.products,
@@ -83,13 +83,13 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
     balancePayment: 0,
     balanceDue: 0,
     isPreOrder: false,
-    itemTax:0
+    itemTax: 0,
   }
-  let priceWithShipment = getTotalsWithId('Shipping',orderDetails.totals)
-    // orderDetails.totals.filter((res: any) => res.id === 'Shipping')[0].value /
-    // 100
+  let priceWithShipment = getTotalsWithId('Shipping', orderDetails.totals)
+  // orderDetails.totals.filter((res: any) => res.id === 'Shipping')[0].value /
+  // 100
 
-    let totalTax = getTotalsWithId('Tax',orderDetails.totals)
+  let totalTax = getTotalsWithId('Tax', orderDetails.totals)
 
   let allItems
   let shippingCost
@@ -112,7 +112,7 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
   if (vbaseOrderDetails != null) {
     let changeobj = []
     for (const item of invoiceDetails.items) {
-      if(item.itemIndex === -1){
+      if (item.itemIndex === -1) {
         continue
       }
       // if (!isPreorder) {
@@ -129,8 +129,13 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       item.detailUrl = allItems.detailUrl
       // }
       // if (isPreorder) {
-      const { depositPayment, balancePayment, balanceDue, isPreOrder, itemTax } =
-        await extractPreOrderInfo(preOrderDetails, item)
+      const {
+        depositPayment,
+        balancePayment,
+        balanceDue,
+        isPreOrder,
+        itemTax,
+      } = await extractPreOrderInfo(preOrderDetails, item)
       preorderPayment.depositPayment =
         preorderPayment.depositPayment + depositPayment
       preorderPayment.balancePayment =
@@ -166,10 +171,12 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       orderDetails.packageAttachment.packages,
       orderDetails.items
     )
-     
+
     remainingTax = totalTax - preorderPayment.itemTax
-    console.log(`REMAINING TAX - ${remainingTax}  AND ITEM TAX -  ${preorderPayment.itemTax}`);
-    
+    console.log(
+      `REMAINING TAX - ${remainingTax}  AND ITEM TAX -  ${preorderPayment.itemTax}`
+    )
+
     console.log('All Items are invoiced', allItemInvoiced)
     // if (preorderPayment.depositPayment !== 0) {
     //   preorderPayment.depositPayment = allItemInvoiced
@@ -177,16 +184,18 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
     //     : preorderPayment.depositPayment
     // } else {
 
-      preorderPayment.balancePayment = allItemInvoiced
-        ? preorderPayment.balancePayment + priceWithShipment + remainingTax
-        : preorderPayment.balancePayment
+    preorderPayment.balancePayment = allItemInvoiced
+      ? preorderPayment.balancePayment + priceWithShipment + remainingTax
+      : preorderPayment.balancePayment
     // }
 
     vbaseOrderDetails[newOrderId[1]] = !vbaseOrderDetails[newOrderId[1]]
       ? {}
       : vbaseOrderDetails[newOrderId[1]]
 
-    preorderPayment.itemTax = allItemInvoiced ? preorderPayment.itemTax + remainingTax : preorderPayment.itemTax  
+    preorderPayment.itemTax = allItemInvoiced
+      ? preorderPayment.itemTax + remainingTax
+      : preorderPayment.itemTax
     // preorderPayment.balancePayment = allItemInvoiced ? preorderPayment.balancePayment + remainingTax : preorderPayment.balancePayment
     vbaseOrderDetails[newOrderId[1]][invoiceDetails.invoiceNumber] = {
       items: changeobj,
@@ -212,6 +221,7 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       vbaseOrderDetails['newInvoiceData'] = invoiceData
     }
     vbaseOrderDetails[newOrderId[1]].allItemInvoiced = allItemInvoiced
+    vbaseOrderDetails['paidAmount'] = vbaseOrderDetails['paidAmount']
     console.log('Vbase details after saving the all details', vbaseOrderDetails)
 
     saveToVbaseResponse = await saveVbaseData(
@@ -223,7 +233,7 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
     let saveObj: any = {}
     let items = []
     for (const item of invoiceDetails.items) {
-      if(item.itemIndex === -1){
+      if (item.itemIndex === -1) {
         continue
       }
 
@@ -239,8 +249,13 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       item.productId = allItems.productId
       item.detailUrl = allItems.detailUrl
 
-      const { depositPayment, balancePayment, balanceDue, isPreOrder, itemTax } =
-        await extractPreOrderInfo(preOrderDetails, item)
+      const {
+        depositPayment,
+        balancePayment,
+        balanceDue,
+        isPreOrder,
+        itemTax,
+      } = await extractPreOrderInfo(preOrderDetails, item)
       preorderPayment.depositPayment =
         preorderPayment.depositPayment + depositPayment
       preorderPayment.balancePayment =
@@ -280,11 +295,13 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
     //     ? preorderPayment.depositPayment + priceWithShipment + remainingTax
     //     : preorderPayment.depositPayment
     // } else {
-      preorderPayment.balancePayment = allItemInvoiced
-        ? preorderPayment.balancePayment + priceWithShipment + remainingTax
-        : preorderPayment.balancePayment
+    preorderPayment.balancePayment = allItemInvoiced
+      ? preorderPayment.balancePayment + priceWithShipment + remainingTax
+      : preorderPayment.balancePayment
     // }
-    preorderPayment.itemTax = allItemInvoiced ? preorderPayment.itemTax + remainingTax : preorderPayment.itemTax
+    preorderPayment.itemTax = allItemInvoiced
+      ? preorderPayment.itemTax + remainingTax
+      : preorderPayment.itemTax
     saveObj[newOrderId[1]] = {
       [invoiceDetails.invoiceNumber]: {
         items: items,
@@ -301,21 +318,23 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
     saveObj['shippingData'] = shippingData
     saveObj['newInvoiceData'] = invoiceData
     saveObj['orderId'] = orderDetails.orderId.split('-')[0]
+    saveObj['paidAmount'] =
+      saveObj['paidAmount'] ?? preOrderDetails?.paidAmount ?? 0
 
     console.log('Order Id save-->', newOrderId[0])
     console.log({ saveObj })
     saveToVbaseResponse = await saveVbaseData(newOrderId[0], saveObj, ctx)
   }
-  addLog(ctx,{
+  addLog(ctx, {
     orderId: orderId,
-    invoiceId:invoiceDetails.invoiceNumber,
-    skuId:null,
-    message:'After saving the invoice data into vbase!',
-    body:JSON.stringify({
+    invoiceId: invoiceDetails.invoiceNumber,
+    skuId: null,
+    message: 'After saving the invoice data into vbase!',
+    body: JSON.stringify({
       preOrderDetails,
       isPreorder,
-      invoiceDetails
-    })
+      invoiceDetails,
+    }),
   })
   const vbaseOrderDetails1: any = await getVbaseData(ctx, newOrderId[0])
 
@@ -396,22 +415,19 @@ export async function notifyBuyer(
       trackingUrl,
     },
   }
-  let emailRes;
-  try{
-     emailRes = await email.notify(account, payload)
+  let emailRes
+  try {
+    emailRes = await email.notify(account, payload)
     console.log('Buyer RESPONSE FROM EMAIL REQUEST  - ', { emailRes })
-  }catch(e){
+  } catch (e) {
     emailRes = e.message
-    console.log('Error While sending the email - ',e.message)
+    console.log('Error While sending the email - ', e.message)
   }
-  
 
   return emailRes
 }
 
-
-function getTotalsWithId(totalsId:string, totals:any[]){
- const value =  totals.filter((res: any) => res.id === totalsId)[0].value /
-    100
- return value
+function getTotalsWithId(totalsId: string, totals: any[]) {
+  const value = totals.filter((res: any) => res.id === totalsId)[0].value / 100
+  return value
 }
