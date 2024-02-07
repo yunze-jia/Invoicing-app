@@ -6,7 +6,10 @@ export async function getOrderDetails(ctx: any) {
   const orderId = ctx.vtex.route.params.orderId
   const {
     vtex: { account, authToken },
+    clients: {preOrder, apps},
   } = ctx
+  const appId = process.env.VTEX_APP_ID as string
+  const customFields = await apps.getAppSettings(appId)
   const options: any = {
     method: 'GET',
     url: `http://${account}.${constants.VTEX_COMMERCE_BASE_URL}/oms/pvt/orders/${orderId}`,
@@ -30,6 +33,10 @@ export async function getOrderDetails(ctx: any) {
       ctx.status = 201
       console.log(error)
     })
-  ctx.body = orderDetails
+    const preOrderDetails = await preOrder.getPreOrder(
+      orderId.split('-')[0],
+      customFields
+    )
+  ctx.body = {orderDetails,preOrderDetails}
   return orderDetails
 }

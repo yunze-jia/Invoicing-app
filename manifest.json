@@ -1,7 +1,7 @@
 {
   "name": "native-invoicing-app",
   "vendor": "vtexasia",
-  "version": "5.0.28",
+  "version": "5.0.30",
   "title": "Native Invoicing Application",
   "description": "Sending the invoice email to both Buyer and Seller ",
   "mustUpdateAt": "2018-01-04",
