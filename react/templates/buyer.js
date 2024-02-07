@@ -1,9 +1,6 @@
 /* eslint-disable react/jsx-key */
 import React, { useEffect, useState } from 'react'
-import {
-  getNewBuyerOrderDetails,
-  getOrderDetails,
-} from '../services/order'
+import { getNewBuyerOrderDetails, getOrderDetails } from '../services/order'
 const styles = require('../index.css')
 const moment = require('moment')
 
@@ -95,9 +92,9 @@ export const BuyerTemplate = ({ body }) => {
             const isLast = vbaseKey.length === index + 1
             const newOrder = order.vbase[data]
             orderSuffix = newOrder[invoiceUrl]
-            let date = moment(orderDetailsById?.orderDetails?.creationDate ?? '').format(
-              'MMMM Do YYYY, h:mm:ss a'
-            )
+            let date = moment(
+              orderDetailsById?.orderDetails?.creationDate ?? ''
+            ).format('MMMM Do YYYY, h:mm:ss a')
             total =
               orderDetailsById?.orderDetails?.paymentData?.transactions.reduce(
                 (initial, ongoing) => {
@@ -392,8 +389,10 @@ export const BuyerTemplate = ({ body }) => {
 
                 <div>
                   <h5>
-                    Part of order {orderDetailsById?.orderDetails?.orderId.split('-')[0] ?? ''} with
-                    Total payment ${total} on {date}
+                    Part of order{' '}
+                    {orderDetailsById?.orderDetails?.orderId.split('-')[0] ??
+                      ''}{' '}
+                    with Total payment ${total} on {date}
                   </h5>
                 </div>
 
@@ -482,10 +481,17 @@ export const BuyerTemplate = ({ body }) => {
                         justifyContent: 'space-between',
                       }}
                     >
-                    <div>Total paid on Checkout </div>
-                      <div>{`$${(
-                        (order?.vbase?.paidAmount*1)/100 ?? 0
-                      ).toFixed(2)}`}</div>
+                      {order?.vbase?.paidAmount ? (
+                        <>
+                          <div>Total paid on Checkout </div>
+                          <div>{`$${(
+                            (order?.vbase?.paidAmount * 1) /
+                            100
+                          ).toFixed(2)}`}</div>
+                        </>
+                      ) : (
+                        <></>
+                      )}
                     </div>
                   </div>
                 </div>
