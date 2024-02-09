@@ -387,13 +387,15 @@ export const BuyerTemplate = ({ body }) => {
                   </table>
                 </div>
 
-                <div>
-                  <h5>
+                <div style={{marginBottom:'10px'}}>
+                   <b>
                     Part of order{' '}
-                    {orderDetailsById?.orderDetails?.orderId.split('-')[0] ??
-                      ''}{' '}
-                    with Total payment ${total} on {date}
-                  </h5>
+                      {orderDetailsById?.orderDetails?.orderId.split('-')[0] ??
+                        ''}{' '}
+                    </b> 
+                </div>
+                <div>
+                  <b>Total Value ${total} When all the preorders are completed</b> 
                 </div>
 
                 <div
@@ -483,7 +485,7 @@ export const BuyerTemplate = ({ body }) => {
                     >
                       {order?.vbase?.paidAmount ? (
                         <>
-                          <div>Total paid on Checkout </div>
+                          <div>Total Transaction</div>
                           <div>{`$${(
                             (order?.vbase?.paidAmount * 1) /
                             100
@@ -492,6 +494,15 @@ export const BuyerTemplate = ({ body }) => {
                       ) : (
                         <></>
                       )}
+                    </div>
+                    <div
+                      className={styles.spacing}
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                     Date : {date}
                     </div>
                   </div>
                 </div>
