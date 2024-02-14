@@ -221,7 +221,8 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       vbaseOrderDetails['newInvoiceData'] = invoiceData
     }
     vbaseOrderDetails[newOrderId[1]].allItemInvoiced = allItemInvoiced
-    vbaseOrderDetails['paidAmount'] = vbaseOrderDetails['paidAmount']
+    vbaseOrderDetails['paidAmount'][invoiceDetails.invoiceNumber] =
+      preOrderDetails.paidAmount
     console.log('Vbase details after saving the all details', vbaseOrderDetails)
 
     saveToVbaseResponse = await saveVbaseData(
@@ -318,8 +319,9 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
     saveObj['shippingData'] = shippingData
     saveObj['newInvoiceData'] = invoiceData
     saveObj['orderId'] = orderDetails.orderId.split('-')[0]
-    saveObj['paidAmount'] =
-      saveObj['paidAmount'] ?? preOrderDetails?.paidAmount ?? 0
+    saveObj['paidAmount'] = {}
+    saveObj['paidAmount'][invoiceDetails.invoiceNumber] =
+      preOrderDetails?.paidAmount
 
     console.log('Order Id save-->', newOrderId[0])
     console.log({ saveObj })

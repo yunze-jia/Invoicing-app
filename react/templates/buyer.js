@@ -387,15 +387,17 @@ export const BuyerTemplate = ({ body }) => {
                   </table>
                 </div>
 
-                <div style={{marginBottom:'10px'}}>
-                   <b>
+                <div style={{ marginBottom: '10px' }}>
+                  <b>
                     Part of order{' '}
-                      {orderDetailsById?.orderDetails?.orderId.split('-')[0] ??
-                        ''}{' '}
-                    </b> 
+                    {orderDetailsById?.orderDetails?.orderId.split('-')[0] ??
+                      ''}{' '}
+                  </b>
                 </div>
                 <div>
-                  <b>Total Value ${total} When all the preorders are completed</b> 
+                  <b>
+                    Total Value ${total} When all the preorders are completed
+                  </b>
                 </div>
 
                 <div
@@ -483,11 +485,15 @@ export const BuyerTemplate = ({ body }) => {
                         justifyContent: 'space-between',
                       }}
                     >
-                      {order?.vbase?.paidAmount ? (
+                      {order?.vbase['paidAmount'] &&
+                      order?.vbase['paidAmount'][orderSuffix?.invoiceNumber] ? (
                         <>
                           <div>Total Transaction</div>
                           <div>{`$${(
-                            (order?.vbase?.paidAmount * 1) /
+                            (order?.vbase['paidAmount'][
+                              orderSuffix?.invoiceNumber
+                            ] *
+                              1) /
                             100
                           ).toFixed(2)}`}</div>
                         </>
@@ -502,7 +508,7 @@ export const BuyerTemplate = ({ body }) => {
                         justifyContent: 'space-between',
                       }}
                     >
-                     Date : {date}
+                      Date : {date}
                     </div>
                   </div>
                 </div>
