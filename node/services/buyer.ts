@@ -37,8 +37,6 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
     message: 'Getting vbase!',
     body: JSON.stringify(vbaseOrderDetails),
   })
-  console.log('Vbase order details - ', { vbaseOrderDetails })
-  console.log('Get ORder by Id  - ', newOrderId[0])
   let shippingData = orderDetails.shippingData
   let invoiceData = {
     status: orderDetails.status,
@@ -204,10 +202,6 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       shippingCharge: allItemInvoiced ? shippingCost : 0,
     }
     console.log(
-      'Vbase details after saving the invoie details',
-      vbaseOrderDetails
-    )
-    console.log(
       'vbase if total are there - ',
       vbaseOrderDetails[newOrderId[1]]?.totals
     )
@@ -221,6 +215,7 @@ export const buildBuyerInvoiceInfo = async (orderId: any, ctx: any) => {
       vbaseOrderDetails['newInvoiceData'] = invoiceData
     }
     vbaseOrderDetails[newOrderId[1]].allItemInvoiced = allItemInvoiced
+    vbaseOrderDetails['paidAmount'] = vbaseOrderDetails['paidAmount'] ?? {}
     vbaseOrderDetails['paidAmount'][invoiceDetails.invoiceNumber] =
       preOrderDetails.paidAmount
     console.log('Vbase details after saving the all details', vbaseOrderDetails)
