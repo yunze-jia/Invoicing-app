@@ -249,7 +249,7 @@ export const BuyerTemplate = ({ body }) => {
                           <b>Whola Pty Ltd</b>
                         </div>
                         <div>
-                          <div>ABN 76 632 555</div>
+                          <div>ABN 75 632 644 565</div>
                         </div>
                       </div>
                       <div>

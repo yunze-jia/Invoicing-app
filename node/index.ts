@@ -13,6 +13,7 @@ import { getOrderDetails } from './middlewares/getOrder'
 import { orderHooks } from './middlewares/orderHooks'
 import { ordersWebhook, trigger } from './middlewares/ordersWebhook'
 import { sellerInvoiceInfo } from './middlewares/seller'
+import { test } from './services/test'
 
 const TIMEOUT_MS = 800
 const TREE_SECONDS_MS = 3 * 1000
@@ -98,6 +99,9 @@ export default new Service({
     }),
     buyerEncrptEnvoice: method({
       GET: [getBuyerEmail],
+    }),
+    test: method({
+      GET: [test],
     }),
   },
   events: {

@@ -33,6 +33,10 @@
     "buyerEncrptEnvoice": {
       "path": "/_v/orders/buyerEncrptEmails/:orderId",
       "public": true
+    },
+    "test": {
+      "path": "/_v/orders/test/:orderId",
+      "public": true
     }
   },
   "events": {
